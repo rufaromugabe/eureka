@@ -1,5 +1,9 @@
-import 'package:eureka/examout.dart';
+import 'dart:io';
+import 'package:path/path.dart' as path;
+import 'package:docx_to_text/docx_to_text.dart';
+import 'package:eureka/examhandler.dart';
 import 'package:flutter/material.dart';
+import 'package:file_picker/file_picker.dart';
 
 class ExamScreen extends StatefulWidget {
   @override
@@ -9,14 +13,26 @@ class ExamScreen extends StatefulWidget {
 class _ExamScreenState extends State<ExamScreen> {
   final _controller = TextEditingController();
 
-  void _submitText() {
-    final enteredText = _controller.text;
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => Examout(text: enteredText),
-      ),
-    );
-    print(enteredText);
+  Future<void> pickAndReadFile() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles();
+
+    if (result != null) {
+      File file = File(result.files.single.path!);
+      String extension = path.extension(file.path);
+
+      if (extension == '.docx') {
+        final bytes = await file.readAsBytes();
+        final fileContent = docxToText(bytes);
+        _controller.text = fileContent;
+      } else if (extension == '.txt') {
+        String fileContent = await file.readAsString();
+        _controller.text = fileContent;
+      } else {
+        _controller.text = 'Unsupported file type';
+      }
+    } else {
+      // User canceled the picker
+    }
   }
 
   @override
@@ -33,25 +49,39 @@ class _ExamScreenState extends State<ExamScreen> {
                 height: 5,
               ),
               TextField(
-                maxLines: 17,
+                maxLines: 10,
                 controller: _controller,
                 decoration: InputDecoration(
                     hintText: 'Enter Exam Content',
                     border: OutlineInputBorder()),
               ),
               SizedBox(
-                height: 20,
+                height: 30,
               ),
-              ElevatedButton(
-                  onPressed: () {
-                    _submitText;
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => Examout(text: _controller.text),
-                      ),
-                    );
-                  },
-                  child: Text('Submit'))
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  ElevatedButton(
+                      onPressed: () {
+                        pickAndReadFile();
+                      },
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.deepPurple),
+                      child: Text('Upload')),
+                  ElevatedButton(
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                Examout(text: _controller.text),
+                          ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.deepPurple),
+                      child: Text('Continue')),
+                ],
+              ),
             ],
           ),
         ),
