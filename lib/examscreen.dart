@@ -5,6 +5,9 @@ import 'package:eureka/examhandler.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 
+double currentSliderValue = 50;
+String dropdownValue = 'Multiple Choice';
+
 class ExamScreen extends StatefulWidget {
   @override
   _ExamScreenState createState() => _ExamScreenState();
@@ -39,7 +42,7 @@ class _ExamScreenState extends State<ExamScreen> {
   build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text('AI Exam Paper'),
+          title: Text('Eureka Exam Planner'),
         ),
         body: Padding(
           padding: const EdgeInsets.all(20.0),
@@ -59,28 +62,90 @@ class _ExamScreenState extends State<ExamScreen> {
                 height: 30,
               ),
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  ElevatedButton(
-                      onPressed: () {
-                        pickAndReadFile();
-                      },
-                      style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.deepPurple),
-                      child: Text('Upload')),
-                  ElevatedButton(
-                      onPressed: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                Examout(text: _controller.text),
-                          ),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.deepPurple),
-                      child: Text('Continue')),
+                  Text(
+                    'Question Type: ',
+                    style: TextStyle(fontSize: 16),
+                  ),
+                  DropdownButton<String>(
+                    value: dropdownValue,
+                    iconSize: 24,
+                    elevation: 16,
+                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 1),
+                    borderRadius: BorderRadius.all(Radius.circular(20)),
+                    focusColor: Color.fromARGB(255, 1, 4, 19),
+                    dropdownColor: Color.fromARGB(255, 1, 4, 19),
+                    underline: Container(
+                        decoration: BoxDecoration(color: Colors.blue)),
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        dropdownValue = newValue!;
+                      });
+                    },
+                    items: <String>[
+                      'Multiple Choice',
+                      'True or False',
+                      'Short Answer',
+                      'Essay'
+                    ].map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                  ),
                 ],
+              ),
+              Expanded(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Expanded(
+                      child: Slider(
+                        value: currentSliderValue,
+                        min: 0,
+                        max: 100,
+                        divisions: 100,
+                        label: currentSliderValue.round().toString(),
+                        onChanged: (double value) {
+                          setState(() {
+                            currentSliderValue = value;
+                          });
+                        },
+                      ),
+                    ),
+                    Text(
+                      ' ${currentSliderValue.round()} Marks',
+                      style: TextStyle(fontSize: 16),
+                    ),
+                  ],
+                ),
+              ),
+              Flexible(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    ElevatedButton(
+                        onPressed: () {
+                          pickAndReadFile();
+                        },
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.deepPurple),
+                        child: Text('Upload')),
+                    ElevatedButton(
+                        onPressed: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  Examout(text: _controller.text),
+                            ),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.deepPurple),
+                        child: Text('Continue')),
+                  ],
+                ),
               ),
             ],
           ),

@@ -1,10 +1,8 @@
-import 'dart:convert';
-
+import 'package:eureka/examscreen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
-import 'package:document_file_save_plus/document_file_save_plus.dart';
 
 class Examout extends StatefulWidget {
   final String text;
@@ -17,6 +15,7 @@ class Examout extends StatefulWidget {
 class _ExamoutState extends State<Examout> {
   String? _response = "";
   int num = 0;
+  int guide = 0;
   late final GenerativeModel _model;
   late final ChatSession _chat;
   final String apiKey = "AIzaSyDRiI5PgPjGCoWOjOZxSf0a5P_6lirLPQc";
@@ -26,52 +25,42 @@ class _ExamoutState extends State<Examout> {
   void initState() {
     super.initState();
     _model = GenerativeModel(
-      model: 'gemini-pro',
+      model: 'gemini-1.5-pro-latest',
       apiKey: apiKey,
+      systemInstruction: Content.text((guide == 0
+          ? 'Write exam questions for the topic(s) with ${currentSliderValue.round()} marks and the Question types should be set as $dropdownValue. Give instructions to the students.'
+          : 'Give the Marking guide for the Exam above')),
     );
     _chat = _model.startChat();
   }
 
-  void _savFile(String data) {
-    List<int> textBytes = utf8.encode(data);
-
-    Uint8List textBytes1 = Uint8List.fromList(textBytes);
-    DocumentFileSavePlus()
-        .saveFile(textBytes1, "my_sample_file.docx", "text/plain");
-  }
-
-  @override
   Future<String> _sendChatMessage(String message) async {
-    if (_chatFuture == null) {
-      try {
-        final response = await _chat.sendMessage(
-          Content.text(message),
-        );
-        _response = response.text;
+    try {
+      final response = await _chat.sendMessage(
+        Content.text(message),
+      );
+      _response = response.text;
 
-        if (_response == null) {
-          print('Empty response.');
-          return 'Empty response.';
-        } else {
-          num = 1;
+      if (_response == null) {
+        print('Empty response.');
+        return 'Empty response.';
+      } else {
+        num = 1;
 
-          setState(() {});
-          return _response!;
-        }
-      } catch (e) {
-        print(e.toString());
-        return 'Error: ${e.toString()}';
+        setState(() {});
+        return _response!;
       }
-    } else {
-      return _response ?? 'No response yet.';
+    } catch (e) {
+      print(e.toString());
+      return 'Error: ${e.toString()}';
     }
   }
 
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.deepPurple,
-        title: Text('MY Exam'),
+        backgroundColor: Color.fromARGB(255, 14, 9, 22),
+        title: Text('My Exam'),
       ),
       body: Center(
         child: Row(
@@ -115,34 +104,44 @@ class _ExamoutState extends State<Examout> {
                                     backgroundColor: Colors.deepPurple),
                                 child: Text('Copy')),
                             ElevatedButton(
-                                onPressed: () {
-                                  setState(() {
-                                    String markdown =
-                                        _response!.replaceAll('**', '');
-                                    String markdownTable = markdown;
-                                    String plainTextTable = markdownTable
-                                        .replaceAll('|', '\t')
-                                        .replaceAll('---', '');
-                                    _savFile(plainTextTable);
-
-                                    print('Copied');
-                                  });
+                              onPressed: () {
+                                setState(() {
+                                  guide = 1;
+                                  _chatFuture = _sendChatMessage(
+                                      'Give the Marking guide for the Exam above');
+                                });
+                                Clipboard.setData(
+                                    ClipboardData(text: _response!));
+                              },
+                              style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors
+                                      .deepPurple // This is the button color
+                                  ),
+                              child: FutureBuilder<String>(
+                                future: _chatFuture,
+                                builder: (BuildContext context,
+                                    AsyncSnapshot<String> snapshot) {
+                                  if (snapshot.connectionState ==
+                                      ConnectionState.waiting) {
+                                    return CircularProgressIndicator();
+                                  } else {
+                                    return Text('Marking guild');
+                                  }
                                 },
-                                style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.deepPurple),
-                                child: Text('Guide')),
+                              ),
+                            ),
                           ],
                         ),
+                        SizedBox(height: 20),
                         MarkdownBody(data: _response!),
                       ] else ...[
-                        Text('Click the button to get your exam paper here.'),
+                        Text('Click the button to get your exam paper.'),
                         SizedBox(height: 10),
                         ElevatedButton(
                           onPressed: () {
                             setState(() {
                               _chatFuture = _sendChatMessage(widget.text);
                             });
-                            Clipboard.setData(ClipboardData(text: _response!));
                           },
                           style: ElevatedButton.styleFrom(
                               backgroundColor:
