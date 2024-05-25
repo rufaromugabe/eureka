@@ -28,7 +28,7 @@ class _ExamoutState extends State<Examout> {
       model: 'gemini-1.5-pro-latest',
       apiKey: apiKey,
       systemInstruction: Content.text((guide == 0
-          ? 'Write exam questions for the topic(s) with ${currentSliderValue.round()} marks and the Question types should be set as $dropdownValue. Give instructions to the students.'
+          ? 'Write exam questions for the topic(s) with ${markSliderValue.round()} marks and the Question types should be set as $typeDropdownValue. The exam should be $strengthDropdownValue. Give instructions to the students.'
           : 'Give the Marking guide for the Exam above')),
     );
     _chat = _model.startChat();
@@ -42,7 +42,6 @@ class _ExamoutState extends State<Examout> {
       _response = response.text;
 
       if (_response == null) {
-        print('Empty response.');
         return 'Empty response.';
       } else {
         num = 1;
@@ -51,6 +50,23 @@ class _ExamoutState extends State<Examout> {
         return _response!;
       }
     } catch (e) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Connection Error'),
+            content: Text(e.toString()),
+            actions: <Widget>[
+              TextButton(
+                child: Text('Close'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
       print(e.toString());
       return 'Error: ${e.toString()}';
     }
@@ -68,7 +84,7 @@ class _ExamoutState extends State<Examout> {
           children: [
             Flexible(
               child: Container(
-                constraints: const BoxConstraints(maxWidth: 480),
+                constraints: const BoxConstraints(maxWidth: 800),
                 decoration: BoxDecoration(
                   border: Border.all(color: Colors.white),
                   borderRadius: BorderRadius.circular(18),
@@ -96,8 +112,6 @@ class _ExamoutState extends State<Examout> {
                                         .replaceAll('---', '');
                                     Clipboard.setData(
                                         ClipboardData(text: plainTextTable));
-
-                                    print('Copied');
                                   });
                                 },
                                 style: ElevatedButton.styleFrom(

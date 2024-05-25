@@ -1,12 +1,15 @@
 import 'dart:io';
+import 'package:eureka/widgets/custombutton.dart';
+import 'package:eureka/widgets/customdropdown.dart';
 import 'package:path/path.dart' as path;
 import 'package:docx_to_text/docx_to_text.dart';
 import 'package:eureka/examhandler.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 
-double currentSliderValue = 50;
-String dropdownValue = 'Multiple Choice';
+double markSliderValue = 50;
+String typeDropdownValue = 'Multiple Choice';
+String strengthDropdownValue = 'Easy';
 
 class ExamScreen extends StatefulWidget {
   @override
@@ -31,138 +34,144 @@ class _ExamScreenState extends State<ExamScreen> {
         String fileContent = await file.readAsString();
         _controller.text = fileContent;
       } else {
-        _controller.text = 'Unsupported file type';
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('File Error'),
+              content: Text('Unsupported file type'),
+              actions: <Widget>[
+                TextButton(
+                  child: Text('Close'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          },
+        );
       }
-    } else {
-      // User canceled the picker
-    }
+    } else {}
   }
 
   @override
   build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text('Eureka Exam Planner'),
-        ),
-        body: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            children: [
-              SizedBox(
-                height: 5,
-              ),
-              TextField(
-                maxLines: 10,
-                controller: _controller,
-                decoration: InputDecoration(
-                    hintText: 'Enter Exam Content',
-                    border: OutlineInputBorder()),
-              ),
-              SizedBox(
-                height: 30,
-              ),
-              Row(
+      appBar: AppBar(
+        title: Text('Exam Generator'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          children: [
+            SizedBox(
+              height: 5,
+            ),
+            TextField(
+              maxLines: 8,
+              controller: _controller,
+              decoration: InputDecoration(
+                  hintText: 'Enter Exam Content', border: OutlineInputBorder()),
+            ),
+            SizedBox(
+              height: 40,
+            ),
+            Row(
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Type: ',
+                      style: TextStyle(fontSize: 16),
+                    ),
+                    CustomDropdown(
+                      value: typeDropdownValue,
+                      items: [
+                        'Multiple Choice',
+                        'True or False',
+                        'Short Answer',
+                        'Essay'
+                      ],
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          typeDropdownValue = newValue!;
+                        });
+                      },
+                    )
+                  ],
+                ),
+                Spacer(),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Strength: ',
+                      style: TextStyle(fontSize: 16),
+                    ),
+                    CustomDropdown(
+                      value: strengthDropdownValue,
+                      items: ['Very Easy', 'Easy', 'Hard', 'Very Hard'],
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          strengthDropdownValue = newValue!;
+                        });
+                      },
+                    )
+                  ],
+                ),
+              ],
+            ),
+            Expanded(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  Text(
-                    'Question Type: ',
-                    style: TextStyle(fontSize: 16),
+                  Expanded(
+                    child: Slider(
+                      value: markSliderValue,
+                      min: 0,
+                      max: 100,
+                      divisions: 100,
+                      onChanged: (double value) {
+                        setState(() {
+                          markSliderValue = value;
+                        });
+                      },
+                    ),
                   ),
-                  DropdownButton<String>(
-                    value: dropdownValue,
-                    iconSize: 24,
-                    elevation: 16,
-                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 1),
-                    borderRadius: BorderRadius.all(Radius.circular(20)),
-                    focusColor: Color.fromARGB(255, 1, 4, 19),
-                    dropdownColor: Color.fromARGB(255, 1, 4, 19),
-                    underline: Container(
-                        decoration: BoxDecoration(color: Colors.blue)),
-                    onChanged: (String? newValue) {
-                      setState(() {
-                        dropdownValue = newValue!;
-                      });
-                    },
-                    items: <String>[
-                      'Multiple Choice',
-                      'True or False',
-                      'Short Answer',
-                      'Essay'
-                    ].map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
-                      );
-                    }).toList(),
+                  Text(
+                    ' ${markSliderValue.round()} Marks',
+                    style: TextStyle(fontSize: 16),
                   ),
                 ],
               ),
-              Expanded(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    Expanded(
-                      child: Slider(
-                        value: currentSliderValue,
-                        min: 0,
-                        max: 100,
-                        divisions: 100,
-                        label: currentSliderValue.round().toString(),
-                        onChanged: (double value) {
-                          setState(() {
-                            currentSliderValue = value;
-                          });
-                        },
-                      ),
-                    ),
-                    Text(
-                      ' ${currentSliderValue.round()} Marks',
-                      style: TextStyle(fontSize: 16),
-                    ),
-                  ],
-                ),
+            ),
+            Flexible(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  CustomButton(
+                      text: 'Upload',
+                      onPressed: () {
+                        pickAndReadFile();
+                      }),
+                  CustomButton(
+                      text: 'Continue',
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                Examout(text: _controller.text),
+                          ),
+                        );
+                      })
+                ],
               ),
-              Flexible(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    ElevatedButton(
-                        onPressed: () {
-                          pickAndReadFile();
-                        },
-                        style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.deepPurple),
-                        child: Text('Upload')),
-                    ElevatedButton(
-                        onPressed: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  Examout(text: _controller.text),
-                            ),
-                          );
-                        },
-                        style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.deepPurple),
-                        child: Text('Continue')),
-                  ],
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
-        bottomNavigationBar: BottomNavigationBar(items: [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.book),
-            label: 'ExamPrep',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.save),
-            label: 'Assesment',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.play_arrow),
-            label: 'Ask',
-          ),
-        ]));
+      ),
+    );
   }
 }
