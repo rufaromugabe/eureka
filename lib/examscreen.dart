@@ -12,7 +12,10 @@ String typeDropdownValue = 'Multiple Choice';
 String strengthDropdownValue = 'Easy';
 
 class ExamScreen extends StatefulWidget {
+  const ExamScreen({super.key});
+
   @override
+  // ignore: library_private_types_in_public_api
   _ExamScreenState createState() => _ExamScreenState();
 }
 
@@ -35,14 +38,15 @@ class _ExamScreenState extends State<ExamScreen> {
         _controller.text = fileContent;
       } else {
         showDialog(
+          // ignore: use_build_context_synchronously
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: Text('File Error'),
-              content: Text('Unsupported file type'),
+              title: const Text('File Error'),
+              content: const Text('Unsupported file type'),
               actions: <Widget>[
                 TextButton(
-                  child: Text('Close'),
+                  child: const Text('Close'),
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
@@ -56,25 +60,26 @@ class _ExamScreenState extends State<ExamScreen> {
   }
 
   @override
+  @override
   build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Exam Generator'),
+        title: const Text('Exam Generator'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(
           children: [
-            SizedBox(
+            const SizedBox(
               height: 5,
             ),
             TextField(
               maxLines: 8,
               controller: _controller,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                   hintText: 'Enter Exam Content', border: OutlineInputBorder()),
             ),
-            SizedBox(
+            const SizedBox(
               height: 40,
             ),
             Row(
@@ -82,13 +87,13 @@ class _ExamScreenState extends State<ExamScreen> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
+                    const Text(
                       'Type: ',
                       style: TextStyle(fontSize: 16),
                     ),
                     CustomDropdown(
                       value: typeDropdownValue,
-                      items: [
+                      items: const [
                         'Multiple Choice',
                         'True or False',
                         'Short Answer',
@@ -102,17 +107,17 @@ class _ExamScreenState extends State<ExamScreen> {
                     )
                   ],
                 ),
-                Spacer(),
+                const Spacer(),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
+                    const Text(
                       'Strength: ',
                       style: TextStyle(fontSize: 16),
                     ),
                     CustomDropdown(
                       value: strengthDropdownValue,
-                      items: ['Very Easy', 'Easy', 'Hard', 'Very Hard'],
+                      items: const ['Very Easy', 'Easy', 'Hard', 'Very Hard'],
                       onChanged: (String? newValue) {
                         setState(() {
                           strengthDropdownValue = newValue!;
@@ -142,7 +147,7 @@ class _ExamScreenState extends State<ExamScreen> {
                   ),
                   Text(
                     ' ${markSliderValue.round()} Marks',
-                    style: TextStyle(fontSize: 16),
+                    style: const TextStyle(fontSize: 16),
                   ),
                 ],
               ),

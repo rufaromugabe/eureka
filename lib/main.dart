@@ -1,5 +1,5 @@
-import 'package:eureka/Ask.dart';
-import 'package:eureka/Assessment.dart';
+import 'package:eureka/ask.dart';
+import 'package:eureka/assessmentscreen.dart';
 import 'package:eureka/examscreen.dart';
 import 'package:flutter/material.dart';
 
@@ -14,13 +14,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   int _currentIndex = 0;
-  final List<Widget> _children = [
-    askAi(),
-    ExamScreen(),
-    Assessment()
-
-    // Add more pages here
-  ];
+  final List<Widget> _children = [AskAi(), ExamScreen(), AssessmentScreen()];
 
   void onTabTapped(int index) {
     setState(() {

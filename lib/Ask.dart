@@ -2,23 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 
-class askAi extends StatefulWidget {
-  const askAi({super.key});
+class AskAi extends StatefulWidget {
+  const AskAi({super.key});
 
   @override
-  State<askAi> createState() => _askAiState();
+  State<AskAi> createState() => _AskAiState();
 }
 
-class _askAiState extends State<askAi> {
+class _AskAiState extends State<AskAi> {
   String? apiKey;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text('Ask AI'),
+          title: const Text('Ask AI'),
         ),
-        body: ChatWidget());
+        body: const ChatWidget());
   }
 }
 
