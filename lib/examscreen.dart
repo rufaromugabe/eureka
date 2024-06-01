@@ -71,7 +71,6 @@ class _ExamScreenState extends State<ExamScreen> {
   @override
   build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: const Text('Exam Generator'),
       ),
@@ -82,11 +81,14 @@ class _ExamScreenState extends State<ExamScreen> {
             const SizedBox(
               height: 5,
             ),
-            TextField(
-              maxLines: 8,
-              controller: _controller,
-              decoration: const InputDecoration(
-                  hintText: 'Enter Exam Content', border: OutlineInputBorder()),
+            Container(
+              child: TextField(
+                maxLines: 8,
+                controller: _controller,
+                decoration: const InputDecoration(
+                    hintText: 'Enter Exam Content',
+                    border: OutlineInputBorder()),
+              ),
             ),
             const SizedBox(
               height: 40,
@@ -116,7 +118,6 @@ class _ExamScreenState extends State<ExamScreen> {
                     )
                   ],
                 ),
-                const Spacer(),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -141,17 +142,20 @@ class _ExamScreenState extends State<ExamScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  Expanded(
-                    child: Slider(
-                      value: markSliderValue,
-                      min: 0,
-                      max: 100,
-                      divisions: 100,
-                      onChanged: (double value) {
-                        setState(() {
-                          markSliderValue = value;
-                        });
-                      },
+                  Container(
+                    height: 50,
+                    child: Expanded(
+                      child: Slider(
+                        value: markSliderValue,
+                        min: 0,
+                        max: 100,
+                        divisions: 100,
+                        onChanged: (double value) {
+                          setState(() {
+                            markSliderValue = value;
+                          });
+                        },
+                      ),
                     ),
                   ),
                   Text(

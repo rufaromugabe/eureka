@@ -1,42 +1,40 @@
-import 'package:flutter/material.dart';
+import 'dart:async';
+import 'dart:io';
+import 'package:eureka/main.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:path/path.dart' as path;
+import 'package:docx_to_text/docx_to_text.dart';
+import 'package:flutter/material.dart';
+import 'package:file_picker/file_picker.dart';
+
+double lenSliderValue = 50;
+final ImagePicker _picker = ImagePicker();
+XFile? image;
+
+Image? imageFIle = Image.asset('assets/images/placeholder.jpg');
 
 class AskAi extends StatefulWidget {
-  const AskAi({super.key});
+  const AskAi({
+    super.key,
+  });
 
   @override
-  State<AskAi> createState() => _AskAiState();
+  _AskAiState createState() => _AskAiState();
 }
 
 class _AskAiState extends State<AskAi> {
-  String? apiKey;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          title: const Text('Ask AI'),
-        ),
-        body: const ChatWidget());
-  }
-}
-
-class ChatWidget extends StatefulWidget {
-  const ChatWidget({super.key});
-
-  final String apiKey = "AIzaSyDRiI5PgPjGCoWOjOZxSf0a5P_6lirLPQc";
-
-  @override
-  State<ChatWidget> createState() => _ChatWidgetState();
-}
-
-class _ChatWidgetState extends State<ChatWidget> {
+  final _controller = TextEditingController();
+  final _controller1 = TextEditingController();
+  int askindex = 0;
+  String? _response = "";
+  String data = "no data provided please upload a content";
   late final GenerativeModel _model;
   late final ChatSession _chat;
-  final ScrollController _scrollController = ScrollController();
-  final TextEditingController _textController = TextEditingController();
-  final FocusNode _textFieldFocus = FocusNode(debugLabel: 'TextField');
+
   bool _loading = false;
 
   @override
@@ -44,202 +42,220 @@ class _ChatWidgetState extends State<ChatWidget> {
     super.initState();
     _model = GenerativeModel(
       model: 'gemini-1.5-pro-latest',
-      apiKey: widget.apiKey,
+      apiKey: apiKey,
+      systemInstruction: Content.text(
+          "Use this data provided as your knowledge to respond to all questions strictly "),
     );
     _chat = _model.startChat();
   }
 
-  void _scrollDown() {
-    WidgetsBinding.instance.addPostFrameCallback(
-      (_) => _scrollController.animateTo(
-        _scrollController.position.maxScrollExtent,
-        duration: const Duration(
-          milliseconds: 750,
-        ),
-        curve: Curves.easeOutCirc,
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final history = _chat.history.toList();
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            child: ListView.builder(
-              controller: _scrollController,
-              itemBuilder: (context, idx) {
-                final content = history[idx];
-                final text = content.parts
-                    .whereType<TextPart>()
-                    .map<String>((e) => e.text)
-                    .join('');
-                return MessageWidget(
-                  text: text,
-                  isFromUser: content.role == 'user',
-                );
-              },
-              itemCount: history.length,
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(
-              vertical: 25,
-              horizontal: 15,
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    autofocus: true,
-                    focusNode: _textFieldFocus,
-                    decoration:
-                        textFieldDecoration(context, 'Enter a prompt...'),
-                    controller: _textController,
-                    onSubmitted: (String value) {
-                      _sendChatMessage(value);
-                    },
-                  ),
-                ),
-                const SizedBox.square(dimension: 15),
-                if (!_loading)
-                  IconButton(
-                    onPressed: () async {
-                      _sendChatMessage(_textController.text);
-                    },
-                    icon: Icon(
-                      Icons.send,
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
-                  )
-                else
-                  const CircularProgressIndicator(),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Future<void> _sendChatMessage(String message) async {
+  Future<String> getResponse(String message) async {
     setState(() {
       _loading = true;
     });
-
     try {
       final response = await _chat.sendMessage(
         Content.text(message),
       );
-      final text = response.text;
+      _response = response.text;
 
-      if (text == null) {
-        _showError('Empty response.');
-        return;
+      if (_response == null) {
+        return 'Empty response.';
       } else {
         setState(() {
           _loading = false;
-          _scrollDown();
         });
+        return _response!;
       }
     } catch (e) {
-      _showError(e.toString());
-      setState(() {
-        _loading = false;
-      });
-    } finally {
-      _textController.clear();
-      setState(() {
-        _loading = false;
-      });
-      _textFieldFocus.requestFocus();
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Connection Error'),
+            content: Text(e.toString()),
+            actions: <Widget>[
+              TextButton(
+                child: Text('Close'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
+      print(e.toString());
+      return 'Error: ${e.toString()}';
     }
   }
 
-  void _showError(String message) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Something went wrong'),
-          content: SingleChildScrollView(
-            child: Text(message),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('OK'),
-            )
-          ],
+  Future<void> pickAndReadFile() async {
+    var status = await Permission.storage.status;
+    if (!status.isGranted) {
+      status = await Permission.storage.request();
+      if (!status.isGranted) {
+        return;
+      }
+    }
+    FilePickerResult? result = await FilePicker.platform.pickFiles();
+
+    if (result != null) {
+      File file = File(result.files.single.path!);
+      String extension = path.extension(file.path);
+
+      if (extension == '.docx') {
+        final bytes = await file.readAsBytes();
+        final fileContent = docxToText(bytes);
+        data = fileContent;
+        _controller.text = fileContent;
+      } else if (extension == '.txt') {
+        String fileContent = await file.readAsString();
+        _controller.text = fileContent;
+      } else {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('File Error'),
+              content: const Text('Unsupported file type'),
+              actions: <Widget>[
+                TextButton(
+                  child: const Text('Close'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          },
         );
-      },
-    );
+      }
+    } else {}
   }
-}
-
-class MessageWidget extends StatelessWidget {
-  const MessageWidget({
-    super.key,
-    required this.text,
-    required this.isFromUser,
-  });
-
-  final String text;
-  final bool isFromUser;
 
   @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment:
-          isFromUser ? MainAxisAlignment.end : MainAxisAlignment.start,
-      children: [
-        Flexible(
-          child: Container(
-            constraints: const BoxConstraints(maxWidth: 480),
-            decoration: BoxDecoration(
-              color: isFromUser
-                  ? Theme.of(context).colorScheme.primaryContainer
-                  : Theme.of(context).colorScheme.surfaceContainerHighest,
-              borderRadius: BorderRadius.circular(18),
-            ),
-            padding: const EdgeInsets.symmetric(
-              vertical: 15,
-              horizontal: 20,
-            ),
-            margin: const EdgeInsets.only(bottom: 8),
-            child: MarkdownBody(data: text),
+  build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Ask Document'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: SingleChildScrollView(
+          physics: BouncingScrollPhysics(),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const SizedBox(
+                height: 5,
+              ),
+              Row(
+                children: [
+                  Expanded(
+                    child: Container(
+                      alignment: Alignment.center,
+                      height: 80,
+                      child: TextField(
+                        maxLines: 10,
+                        controller: _controller,
+                        decoration: const InputDecoration(
+                            hintText: 'Enter Marking Guide or Question content',
+                            border: OutlineInputBorder()),
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    width: 10,
+                  ),
+                  InkWell(
+                    hoverColor: Colors.deepPurple.withOpacity(0.2),
+                    onTap: () {
+                      pickAndReadFile();
+                    },
+                    child: Container(
+                      width: 80,
+                      height: 80,
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: Colors.white,
+                          width: 2,
+                        ),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          IconButton(
+                            tooltip: "Add File",
+                            icon: Icon(Icons
+                                .upload_file_rounded), // replace with your preferred icon
+                            onPressed: () {
+                              pickAndReadFile();
+                            },
+                          ),
+                          Text('Add File')
+                        ],
+                      ),
+                    ),
+                  )
+                ],
+              ),
+              const SizedBox(
+                height: 20,
+              ),
+              Row(children: [
+                Expanded(
+                  child: TextField(
+                    controller: _controller1,
+                    decoration: const InputDecoration(
+                        hintText: 'Ask your document',
+                        border: OutlineInputBorder()),
+                  ),
+                ),
+                IconButton(
+                    onPressed: () {
+                      setState(() {
+                        getResponse("${_controller1.text} from $data");
+                        askindex = 1;
+                      });
+                    },
+                    icon: Icon(Icons.send)),
+              ]),
+              if (askindex == 1) ...[
+                SizedBox(
+                  height: 20,
+                ),
+                Container(
+                  height: 350,
+                  width: 500,
+                  constraints: const BoxConstraints(maxWidth: 800),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.white),
+                    borderRadius: BorderRadius.circular(18),
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 15,
+                    horizontal: 20,
+                  ),
+                  margin: const EdgeInsets.only(bottom: 8),
+                  child: SingleChildScrollView(
+                    child: Container(
+                        child: _loading
+                            ? Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  CircularProgressIndicator(),
+                                ],
+                              )
+                            : MarkdownBody(data: _response!)),
+                  ),
+                )
+              ]
+            ],
           ),
         ),
-      ],
+      ),
     );
   }
 }
-
-InputDecoration textFieldDecoration(BuildContext context, String hintText) =>
-    InputDecoration(
-      contentPadding: const EdgeInsets.all(15),
-      hintText: hintText,
-      border: OutlineInputBorder(
-        borderRadius: const BorderRadius.all(
-          Radius.circular(14),
-        ),
-        borderSide: BorderSide(
-          color: Theme.of(context).colorScheme.secondary,
-        ),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: const BorderRadius.all(
-          Radius.circular(14),
-        ),
-        borderSide: BorderSide(
-          color: Theme.of(context).colorScheme.secondary,
-        ),
-      ),
-    );
