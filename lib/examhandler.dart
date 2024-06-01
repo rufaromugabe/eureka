@@ -1,4 +1,5 @@
 import 'package:eureka/examscreen.dart';
+import 'package:eureka/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
@@ -14,12 +15,13 @@ class Examout extends StatefulWidget {
 
 class _ExamoutState extends State<Examout> {
   String? _response = "";
-  int num = 0;
-  int guide = 0;
+  int examindex = 0;
+  int guidindex = 0;
   late final GenerativeModel _model;
   late final ChatSession _chat;
-  final String apiKey = "AIzaSyDRiI5PgPjGCoWOjOZxSf0a5P_6lirLPQc";
+
   Future<String>? _chatFuture;
+  bool _loading = false;
 
   @override
   void initState() {
@@ -27,14 +29,17 @@ class _ExamoutState extends State<Examout> {
     _model = GenerativeModel(
       model: 'gemini-1.5-pro-latest',
       apiKey: apiKey,
-      systemInstruction: Content.text((guide == 0
+      systemInstruction: Content.text((guidindex == 0
           ? 'Write exam questions for the topic(s) with ${markSliderValue.round()} marks and the Question types should be set as $typeDropdownValue. The exam should be $strengthDropdownValue. Give instructions to the students.'
           : 'Give the Marking guide for the Exam above')),
     );
     _chat = _model.startChat();
   }
 
-  Future<String> _sendChatMessage(String message) async {
+  Future<String> getExam(String message) async {
+    setState(() {
+      _loading = true;
+    });
     try {
       final response = await _chat.sendMessage(
         Content.text(message),
@@ -44,9 +49,10 @@ class _ExamoutState extends State<Examout> {
       if (_response == null) {
         return 'Empty response.';
       } else {
-        num = 1;
-
-        setState(() {});
+        setState(() {
+          examindex = 1;
+          _loading = false;
+        });
         return _response!;
       }
     } catch (e) {
@@ -79,109 +85,115 @@ class _ExamoutState extends State<Examout> {
         title: Text('My Exam'),
       ),
       body: Center(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Flexible(
-              child: Container(
-                constraints: const BoxConstraints(maxWidth: 800),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.white),
-                  borderRadius: BorderRadius.circular(18),
-                ),
-                padding: const EdgeInsets.symmetric(
-                  vertical: 15,
-                  horizontal: 20,
-                ),
-                margin: const EdgeInsets.only(bottom: 8),
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      if (num == 1) ...[
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            ElevatedButton(
-                                onPressed: () {
-                                  setState(() {
-                                    String markdown =
-                                        _response!.replaceAll('**', '');
-                                    String markdownTable = markdown;
-                                    String plainTextTable = markdownTable
-                                        .replaceAll('|', '\t')
-                                        .replaceAll('---', '');
-                                    Clipboard.setData(
-                                        ClipboardData(text: plainTextTable));
-                                  });
-                                },
-                                style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.deepPurple),
-                                child: Text('Copy')),
-                            ElevatedButton(
-                              onPressed: () {
-                                setState(() {
-                                  guide = 1;
-                                  _chatFuture = _sendChatMessage(
-                                      'Give the Marking guide for the Exam above');
-                                });
-                                Clipboard.setData(
-                                    ClipboardData(text: _response!));
-                              },
-                              style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors
-                                      .deepPurple // This is the button color
-                                  ),
-                              child: FutureBuilder<String>(
-                                future: _chatFuture,
-                                builder: (BuildContext context,
-                                    AsyncSnapshot<String> snapshot) {
-                                  if (snapshot.connectionState ==
-                                      ConnectionState.waiting) {
-                                    return CircularProgressIndicator();
-                                  } else {
-                                    return Text('Marking guild');
-                                  }
-                                },
-                              ),
+        child: examindex == 0
+            ? Center(
+                child: _loading
+                    ? CircularProgressIndicator()
+                    : ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            getExam(widget.text);
+                          });
+                        },
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor:
+                                Colors.deepPurple // This is the button color
                             ),
+                        child: FutureBuilder<String>(
+                          future: _chatFuture,
+                          builder: (BuildContext context,
+                              AsyncSnapshot<String> snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return CircularProgressIndicator();
+                            } else {
+                              return Text('Get Exam');
+                            }
+                          },
+                        ),
+                      ),
+              )
+            : Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Flexible(
+                    child: Container(
+                      constraints: const BoxConstraints(maxWidth: 800),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.white),
+                        borderRadius: BorderRadius.circular(18),
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 15,
+                        horizontal: 20,
+                      ),
+                      margin: const EdgeInsets.only(bottom: 8),
+                      child: SingleChildScrollView(
+                        child: Column(
+                          children: [
+                            if (examindex == 1) ...[
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  ElevatedButton(
+                                      onPressed: () {
+                                        setState(() {
+                                          String markdown =
+                                              _response!.replaceAll('**', '');
+                                          String markdownTable = markdown;
+                                          String plainTextTable = markdownTable
+                                              .replaceAll('|', '\t')
+                                              .replaceAll('---', '');
+                                          Clipboard.setData(ClipboardData(
+                                              text: plainTextTable));
+                                        });
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.deepPurple),
+                                      child: Text('Copy')),
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        guidindex = 1;
+                                        _chatFuture = getExam(
+                                            'Give the Marking guide for the Exam above');
+                                      });
+                                      Clipboard.setData(
+                                          ClipboardData(text: _response!));
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors
+                                            .deepPurple // This is the button color
+                                        ),
+                                    child: FutureBuilder<String>(
+                                      future: _chatFuture,
+                                      builder: (BuildContext context,
+                                          AsyncSnapshot<String> snapshot) {
+                                        if (snapshot.connectionState ==
+                                            ConnectionState.waiting) {
+                                          return CircularProgressIndicator();
+                                        } else {
+                                          return Text('Marking guild');
+                                        }
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 20),
+                              MarkdownBody(data: _response!),
+                            ] else ...[
+                              Text('Click the button to get your exam paper.'),
+                              SizedBox(height: 10),
+                            ]
                           ],
                         ),
-                        SizedBox(height: 20),
-                        MarkdownBody(data: _response!),
-                      ] else ...[
-                        Text('Click the button to get your exam paper.'),
-                        SizedBox(height: 10),
-                        ElevatedButton(
-                          onPressed: () {
-                            setState(() {
-                              _chatFuture = _sendChatMessage(widget.text);
-                            });
-                          },
-                          style: ElevatedButton.styleFrom(
-                              backgroundColor:
-                                  Colors.deepPurple // This is the button color
-                              ),
-                          child: FutureBuilder<String>(
-                            future: _chatFuture,
-                            builder: (BuildContext context,
-                                AsyncSnapshot<String> snapshot) {
-                              if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                                return CircularProgressIndicator();
-                              } else {
-                                return Text('Get Exam');
-                              }
-                            },
-                          ),
-                        ),
-                      ]
-                    ],
+                      ),
+                    ),
                   ),
-                ),
+                ],
               ),
-            ),
-          ],
-        ),
       ),
     );
   }

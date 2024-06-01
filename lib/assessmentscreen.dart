@@ -1,5 +1,10 @@
+import 'dart:async';
 import 'dart:io';
+import 'package:camera/camera.dart';
+import 'package:eureka/main.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:eureka/assessmenthandler.dart';
+import 'package:eureka/takepicture.dart';
 import 'package:eureka/widgets/custombutton.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as path;
@@ -7,16 +12,16 @@ import 'package:docx_to_text/docx_to_text.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 
-double markSliderValue = 50;
-String typeDropdownValue = 'Multiple Choice';
-String strengthDropdownValue = 'Easy';
+double lenSliderValue = 50;
 final ImagePicker _picker = ImagePicker();
 XFile? image;
-final byte = "";
+
 Image? imageFIle = Image.asset('assets/images/placeholder.jpg');
 
 class AssessmentScreen extends StatefulWidget {
-  const AssessmentScreen({super.key});
+  const AssessmentScreen({
+    super.key,
+  });
 
   @override
   _AssessmentScreenState createState() => _AssessmentScreenState();
@@ -26,6 +31,13 @@ class _AssessmentScreenState extends State<AssessmentScreen> {
   final _controller = TextEditingController();
 
   Future<void> pickAndReadFile() async {
+    var status = await Permission.storage.status;
+    if (!status.isGranted) {
+      status = await Permission.storage.request();
+      if (!status.isGranted) {
+        return;
+      }
+    }
     FilePickerResult? result = await FilePicker.platform.pickFiles();
 
     if (result != null) {
@@ -61,6 +73,23 @@ class _AssessmentScreenState extends State<AssessmentScreen> {
     } else {}
   }
 
+  Future<void> ImagegetCamera() async {
+    WidgetsFlutterBinding.ensureInitialized();
+    final cameras = await availableCameras();
+    final firstCamera = cameras.first;
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => TakePictureScreen(camera: firstCamera),
+      ),
+    );
+    if (result != null) {
+      setState(() {
+        imageFIle = result;
+      });
+    }
+  }
+
   Future<void> Imageget() async {
     final XFile? selectedImage =
         await _picker.pickImage(source: ImageSource.gallery);
@@ -85,24 +114,25 @@ class _AssessmentScreenState extends State<AssessmentScreen> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
-        child: Column(
-          children: [
-            const SizedBox(
-              height: 5,
-            ),
-            Expanded(
-              child: Row(
+        child: SingleChildScrollView(
+          physics: BouncingScrollPhysics(),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const SizedBox(
+                height: 5,
+              ),
+              Row(
                 children: [
                   Expanded(
                     child: Container(
                       alignment: Alignment.center,
-                      height: 200,
+                      height: 100,
                       child: TextField(
                         maxLines: 10,
                         controller: _controller,
                         decoration: const InputDecoration(
-                            hintText:
-                                'Enter Marking Guide or Upload Document in docx,txt',
+                            hintText: 'Enter Marking Guide or Question content',
                             border: OutlineInputBorder()),
                       ),
                     ),
@@ -111,12 +141,13 @@ class _AssessmentScreenState extends State<AssessmentScreen> {
                     width: 10,
                   ),
                   InkWell(
-                    hoverColor: Colors.deepPurple.withOpacity(0.5),
+                    hoverColor: Colors.deepPurple.withOpacity(0.2),
                     onTap: () {
                       pickAndReadFile();
                     },
                     child: Container(
                       width: 80,
+                      height: 100,
                       decoration: BoxDecoration(
                         border: Border.all(
                           color: Colors.white,
@@ -142,36 +173,10 @@ class _AssessmentScreenState extends State<AssessmentScreen> {
                   )
                 ],
               ),
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            Expanded(
-              child: Container(
-                  alignment: Alignment.center,
-                  height: 200,
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: Colors.white,
-                      width: 2,
-                    ),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: image == null
-                      ? Center(child: Text('No image selected'))
-                      : imageFIle),
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            InkWell(
-              hoverColor: Colors.deepPurple.withOpacity(0.5),
-              onTap: () {
-                Imageget();
-              },
-              child: Container(
-                height: 80,
-                width: 150,
+              const SizedBox(
+                height: 20,
+              ),
+              Container(
                 decoration: BoxDecoration(
                   border: Border.all(
                     color: Colors.white,
@@ -180,56 +185,135 @@ class _AssessmentScreenState extends State<AssessmentScreen> {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    IconButton(
-                      tooltip: "Add Script",
-                      icon: Icon(Icons
-                          .upload_file_rounded), // replace with your preferred icon
-                      onPressed: () {
-                        Imageget();
-                      },
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Container(
+                          alignment: Alignment.center,
+                          height: 200,
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: Colors.deepPurple,
+                              width: 5,
+                            ),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: image == null
+                              ? Center(child: Text('No Image Script Uploaded'))
+                              : Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: imageFIle,
+                                )),
                     ),
-                    Text('Add Script')
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          InkWell(
+                            onTap: () {
+                              Imageget();
+                            },
+                            child: Container(
+                              height: 80,
+                              width: 100,
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: Colors.white,
+                                  width: 2,
+                                ),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  IconButton(
+                                    tooltip: "Add Script",
+                                    icon: Icon(Icons
+                                        .image), // replace with your preferred icon
+                                    onPressed: () {
+                                      Imageget();
+                                    },
+                                  ),
+                                  Text('Add Gallery')
+                                ],
+                              ),
+                            ),
+                          ),
+                          InkWell(
+                            onTap: () {
+                              ImagegetCamera();
+                            },
+                            child: Container(
+                              height: 80,
+                              width: 100,
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: Colors.white,
+                                  width: 2,
+                                ),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  IconButton(
+                                    tooltip: "Add Script",
+                                    icon: Icon(Icons
+                                        .image), // replace with your preferred icon
+                                    onPressed: () {
+                                      ImagegetCamera();
+                                    },
+                                  ),
+                                  Text('Add Camera')
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),
-            ),
-            Expanded(
-              child: Row(
+              SizedBox(
+                height: 30,
+              ),
+              Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   Expanded(
                     child: Slider(
-                      value: markSliderValue,
+                      value: lenSliderValue,
                       min: 0,
                       max: 100,
                       divisions: 100,
                       onChanged: (double value) {
                         setState(() {
-                          markSliderValue = value;
+                          lenSliderValue = value;
                         });
                       },
                     ),
                   ),
                   Text(
-                    ' ${markSliderValue.round()} % Leniency',
+                    ' ${lenSliderValue.round()} % Leniency',
                     style: const TextStyle(fontSize: 16),
                   ),
                 ],
               ),
-            ),
-            CustomButton(
-                text: 'Continue',
-                onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          AssessmentOut(prompttext: _controller.text),
-                    ),
-                  );
-                })
-          ],
+              CustomButton(
+                  icon: Icons.navigate_next_rounded,
+                  text: 'Continue',
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            AssessmentOut(prompttext: _controller.text),
+                      ),
+                    );
+                  })
+            ],
+          ),
         ),
       ),
     );

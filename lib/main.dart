@@ -2,10 +2,14 @@ import 'package:eureka/ask.dart';
 import 'package:eureka/assessmentscreen.dart';
 import 'package:eureka/examscreen.dart';
 import 'package:flutter/material.dart';
+import 'package:camera/camera.dart';
 
-void main() {
+CameraDescription? firstCamera;
+Future<void> main() async {
   runApp(MyApp());
 }
+
+final String apiKey = "AIzaSyDRiI5PgPjGCoWOjOZxSf0a5P_6lirLPQc";
 
 class MyApp extends StatefulWidget {
   @override

@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:eureka/widgets/custombutton.dart';
 import 'package:eureka/widgets/customdropdown.dart';
 import 'package:path/path.dart' as path;
@@ -23,6 +24,13 @@ class _ExamScreenState extends State<ExamScreen> {
   final _controller = TextEditingController();
 
   Future<void> pickAndReadFile() async {
+    var status = await Permission.storage.status;
+    if (!status.isGranted) {
+      status = await Permission.storage.request();
+      if (!status.isGranted) {
+        return;
+      }
+    }
     FilePickerResult? result = await FilePicker.platform.pickFiles();
 
     if (result != null) {
@@ -63,6 +71,7 @@ class _ExamScreenState extends State<ExamScreen> {
   @override
   build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: const Text('Exam Generator'),
       ),
@@ -93,7 +102,7 @@ class _ExamScreenState extends State<ExamScreen> {
                     ),
                     CustomDropdown(
                       value: typeDropdownValue,
-                      items: const [
+                      items: [
                         'Multiple Choice',
                         'True or False',
                         'Short Answer',
@@ -157,11 +166,13 @@ class _ExamScreenState extends State<ExamScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   CustomButton(
+                      icon: Icons.file_upload,
                       text: 'Upload',
                       onPressed: () {
                         pickAndReadFile();
                       }),
                   CustomButton(
+                      icon: Icons.navigate_next,
                       text: 'Continue',
                       onPressed: () {
                         Navigator.of(context).push(
