@@ -12,13 +12,14 @@ class CustomButton extends StatelessWidget {
     return ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
+          padding: EdgeInsets.all(8.0),
           backgroundColor: Colors.deepPurple,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8.0),
           ),
         ),
         child: Container(
-          width: 100,
+          width: 95,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [

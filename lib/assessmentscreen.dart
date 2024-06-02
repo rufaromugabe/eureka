@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:syncfusion_flutter_pdf/pdf.dart';
 import 'package:camera/camera.dart';
-import 'package:eureka/main.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:eureka/assessmenthandler.dart';
 import 'package:eureka/takepicture.dart';
@@ -44,7 +44,13 @@ class _AssessmentScreenState extends State<AssessmentScreen> {
       File file = File(result.files.single.path!);
       String extension = path.extension(file.path);
 
-      if (extension == '.docx') {
+      if (extension == '.pdf') {
+        final PdfDocument document =
+            PdfDocument(inputBytes: file.readAsBytesSync());
+        String text = PdfTextExtractor(document).extractText();
+        document.dispose();
+        _controller.text = text;
+      } else if (extension == '.docx') {
         final bytes = await file.readAsBytes();
         final fileContent = docxToText(bytes);
         _controller.text = fileContent;
@@ -56,11 +62,11 @@ class _AssessmentScreenState extends State<AssessmentScreen> {
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: const Text('File Error'),
-              content: const Text('Unsupported file type'),
+              title: Text('File Error'),
+              content: Text(" File not Supported"),
               actions: <Widget>[
                 TextButton(
-                  child: const Text('Close'),
+                  child: Text('Close'),
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
@@ -70,7 +76,7 @@ class _AssessmentScreenState extends State<AssessmentScreen> {
           },
         );
       }
-    } else {}
+    }
   }
 
   Future<void> ImagegetCamera() async {
@@ -132,8 +138,13 @@ class _AssessmentScreenState extends State<AssessmentScreen> {
                         maxLines: 10,
                         controller: _controller,
                         decoration: const InputDecoration(
-                            hintText: 'Enter Marking Guide or Question content',
-                            border: OutlineInputBorder()),
+                            filled: true,
+                            fillColor: Color.fromARGB(148, 255, 255, 255),
+                            hintText:
+                                'Enter Marking guide or Question content ',
+                            border: OutlineInputBorder(),
+                            hintStyle: TextStyle(color: Colors.black)),
+                        style: TextStyle(color: Colors.black),
                       ),
                     ),
                   ),

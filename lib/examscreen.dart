@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:syncfusion_flutter_pdf/pdf.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:eureka/widgets/custombutton.dart';
 import 'package:eureka/widgets/customdropdown.dart';
@@ -37,7 +38,13 @@ class _ExamScreenState extends State<ExamScreen> {
       File file = File(result.files.single.path!);
       String extension = path.extension(file.path);
 
-      if (extension == '.docx') {
+      if (extension == '.pdf') {
+        final PdfDocument document =
+            PdfDocument(inputBytes: file.readAsBytesSync());
+        String text = PdfTextExtractor(document).extractText();
+        document.dispose();
+        _controller.text = text;
+      } else if (extension == '.docx') {
         final bytes = await file.readAsBytes();
         final fileContent = docxToText(bytes);
         _controller.text = fileContent;
@@ -46,15 +53,14 @@ class _ExamScreenState extends State<ExamScreen> {
         _controller.text = fileContent;
       } else {
         showDialog(
-          // ignore: use_build_context_synchronously
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: const Text('File Error'),
-              content: const Text('Unsupported file type'),
+              title: Text('File Error'),
+              content: Text(" File not Supported"),
               actions: <Widget>[
                 TextButton(
-                  child: const Text('Close'),
+                  child: Text('Close'),
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
@@ -64,7 +70,7 @@ class _ExamScreenState extends State<ExamScreen> {
           },
         );
       }
-    } else {}
+    }
   }
 
   @override
@@ -86,8 +92,13 @@ class _ExamScreenState extends State<ExamScreen> {
                 maxLines: 8,
                 controller: _controller,
                 decoration: const InputDecoration(
-                    hintText: 'Enter Exam Content',
-                    border: OutlineInputBorder()),
+                    filled: true,
+                    fillColor: Color.fromARGB(148, 255, 255, 255),
+                    hintText:
+                        'Enter Exam Content i.e Course content or Outline ',
+                    border: OutlineInputBorder(),
+                    hintStyle: TextStyle(color: Colors.black)),
+                style: TextStyle(color: Colors.black),
               ),
             ),
             const SizedBox(

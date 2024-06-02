@@ -1,10 +1,6 @@
 import 'dart:async';
-import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:eureka/assessmentscreen.dart';
-import 'package:eureka/main.dart';
-import 'package:eureka/widgets/custombutton.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
 
 class TakePictureScreen extends StatefulWidget {

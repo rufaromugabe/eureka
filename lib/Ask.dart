@@ -1,8 +1,8 @@
 import 'dart:async';
+import 'package:syncfusion_flutter_pdf/pdf.dart';
 import 'dart:io';
 import 'package:eureka/main.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:image_picker/image_picker.dart';
@@ -104,10 +104,15 @@ class _AskAiState extends State<AskAi> {
       File file = File(result.files.single.path!);
       String extension = path.extension(file.path);
 
-      if (extension == '.docx') {
+      if (extension == '.pdf') {
+        final PdfDocument document =
+            PdfDocument(inputBytes: file.readAsBytesSync());
+        String text = PdfTextExtractor(document).extractText();
+        document.dispose();
+        _controller.text = text;
+      } else if (extension == '.docx') {
         final bytes = await file.readAsBytes();
         final fileContent = docxToText(bytes);
-        data = fileContent;
         _controller.text = fileContent;
       } else if (extension == '.txt') {
         String fileContent = await file.readAsString();
@@ -117,11 +122,11 @@ class _AskAiState extends State<AskAi> {
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: const Text('File Error'),
-              content: const Text('Unsupported file type'),
+              title: Text('File Error'),
+              content: Text(" File not Supported"),
               actions: <Widget>[
                 TextButton(
-                  child: const Text('Close'),
+                  child: Text('Close'),
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
@@ -131,7 +136,7 @@ class _AskAiState extends State<AskAi> {
           },
         );
       }
-    } else {}
+    }
   }
 
   @override
@@ -152,22 +157,6 @@ class _AskAiState extends State<AskAi> {
               ),
               Row(
                 children: [
-                  Expanded(
-                    child: Container(
-                      alignment: Alignment.center,
-                      height: 80,
-                      child: TextField(
-                        maxLines: 10,
-                        controller: _controller,
-                        decoration: const InputDecoration(
-                            hintText: 'Enter Marking Guide or Question content',
-                            border: OutlineInputBorder()),
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    width: 10,
-                  ),
                   InkWell(
                     hoverColor: Colors.deepPurple.withOpacity(0.2),
                     onTap: () {
@@ -198,7 +187,30 @@ class _AskAiState extends State<AskAi> {
                         ],
                       ),
                     ),
-                  )
+                  ),
+                  SizedBox(
+                    width: 10,
+                  ),
+                  Expanded(
+                    child: Container(
+                      alignment: Alignment.center,
+                      height: 100,
+                      child: TextField(
+                        maxLines: 10,
+                        controller: _controller,
+                        decoration: const InputDecoration(
+                            filled: true,
+                            fillColor: Color.fromARGB(148, 255, 255, 255),
+                            hintText: 'Enter Documents to Explore ',
+                            border: OutlineInputBorder(),
+                            hintStyle: TextStyle(color: Colors.black)),
+                        style: TextStyle(color: Colors.black),
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    width: 10,
+                  ),
                 ],
               ),
               const SizedBox(
@@ -216,6 +228,7 @@ class _AskAiState extends State<AskAi> {
                 IconButton(
                     onPressed: () {
                       setState(() {
+                        data = _controller.text;
                         getResponse("${_controller1.text} from $data");
                         askindex = 1;
                       });
