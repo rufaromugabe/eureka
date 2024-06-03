@@ -1,5 +1,6 @@
 import 'package:eureka/examscreen.dart';
 import 'package:eureka/main.dart';
+import 'package:eureka/widgets/custombutton.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
@@ -7,7 +8,7 @@ import 'package:google_generative_ai/google_generative_ai.dart';
 
 class Examout extends StatefulWidget {
   final String text;
-  const Examout({Key? key, required this.text}) : super(key: key);
+  const Examout({super.key, required this.text});
 
   @override
   State<Examout> createState() => _ExamoutState();
@@ -56,39 +57,41 @@ class _ExamoutState extends State<Examout> {
         return _response!;
       }
     } catch (e) {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('Connection Error'),
-            content: Text(e.toString()),
-            actions: <Widget>[
-              TextButton(
-                child: Text('Close'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        },
-      );
-      print(e.toString());
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('Connection Error'),
+              content: Text(e.toString()),
+              actions: <Widget>[
+                TextButton(
+                  child: const Text('Close'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      }
+
       return 'Error: ${e.toString()}';
     }
   }
 
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color.fromARGB(255, 14, 9, 22),
-        title: Text('My Exam'),
+        title: const Text('My Exam'),
       ),
       body: Center(
         child: examindex == 0
             ? Center(
                 child: _loading
-                    ? CircularProgressIndicator()
+                    ? const CircularProgressIndicator()
                     : ElevatedButton(
                         onPressed: () {
                           setState(() {
@@ -96,18 +99,31 @@ class _ExamoutState extends State<Examout> {
                           });
                         },
                         style: ElevatedButton.styleFrom(
-                            backgroundColor:
-                                Colors.deepPurple // This is the button color
-                            ),
+                          padding: const EdgeInsets.all(8.0),
+                          backgroundColor: Colors.deepPurple,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                        ),
                         child: FutureBuilder<String>(
                           future: _chatFuture,
                           builder: (BuildContext context,
                               AsyncSnapshot<String> snapshot) {
                             if (snapshot.connectionState ==
                                 ConnectionState.waiting) {
-                              return CircularProgressIndicator();
+                              return const CircularProgressIndicator();
                             } else {
-                              return Text('Get Exam');
+                              return const SizedBox(
+                                width: 100,
+                                height: 40,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(Icons.get_app_sharp),
+                                    Text('Get Exam'),
+                                  ],
+                                ),
+                              );
                             }
                           },
                         ),
@@ -136,22 +152,22 @@ class _ExamoutState extends State<Examout> {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceEvenly,
                                 children: [
-                                  ElevatedButton(
-                                      onPressed: () {
-                                        setState(() {
-                                          String markdown =
-                                              _response!.replaceAll('**', '');
-                                          String markdownTable = markdown;
-                                          String plainTextTable = markdownTable
-                                              .replaceAll('|', '\t')
-                                              .replaceAll('---', '');
-                                          Clipboard.setData(ClipboardData(
-                                              text: plainTextTable));
-                                        });
-                                      },
-                                      style: ElevatedButton.styleFrom(
-                                          backgroundColor: Colors.deepPurple),
-                                      child: Text('Copy')),
+                                  CustomButton(
+                                    text: 'Copy',
+                                    icon: Icons.copy,
+                                    onPressed: () {
+                                      setState(() {
+                                        String markdown =
+                                            _response!.replaceAll('**', '');
+                                        String markdownTable = markdown;
+                                        String plainTextTable = markdownTable
+                                            .replaceAll('|', '\t')
+                                            .replaceAll('---', '');
+                                        Clipboard.setData(ClipboardData(
+                                            text: plainTextTable));
+                                      });
+                                    },
+                                  ),
                                   ElevatedButton(
                                     onPressed: () {
                                       setState(() {
@@ -163,30 +179,38 @@ class _ExamoutState extends State<Examout> {
                                           ClipboardData(text: _response!));
                                     },
                                     style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors
-                                            .deepPurple // This is the button color
-                                        ),
+                                      padding: const EdgeInsets.all(8.0),
+                                      backgroundColor: Colors.deepPurple,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(8.0),
+                                      ),
+                                    ),
                                     child: FutureBuilder<String>(
                                       future: _chatFuture,
                                       builder: (BuildContext context,
                                           AsyncSnapshot<String> snapshot) {
                                         if (snapshot.connectionState ==
                                             ConnectionState.waiting) {
-                                          return CircularProgressIndicator();
+                                          return const CircularProgressIndicator();
                                         } else {
-                                          return Text('Marking guild');
+                                          return const Row(
+                                            children: [
+                                              Icon(Icons
+                                                  .question_answer_outlined),
+                                              Text('Marking guild'),
+                                            ],
+                                          );
                                         }
                                       },
                                     ),
                                   ),
                                 ],
                               ),
-                              SizedBox(height: 20),
+                              const SizedBox(height: 20),
                               MarkdownBody(data: _response!),
-                            ] else ...[
-                              Text('Click the button to get your exam paper.'),
-                              SizedBox(height: 10),
-                            ]
+                            ] else
+                              ...[]
                           ],
                         ),
                       ),

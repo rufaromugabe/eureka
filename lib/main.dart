@@ -1,24 +1,30 @@
+import 'package:camera/camera.dart';
 import 'package:eureka/ask.dart';
 import 'package:eureka/assessmentscreen.dart';
 import 'package:eureka/examscreen.dart';
 import 'package:flutter/material.dart';
-import 'package:camera/camera.dart';
 
 CameraDescription? firstCamera;
 Future<void> main() async {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
-final String apiKey = "AIzaSyDRiI5PgPjGCoWOjOZxSf0a5P_6lirLPQc";
+const String apiKey = "AIzaSyDRiI5PgPjGCoWOjOZxSf0a5P_6lirLPQc";
 
 class MyApp extends StatefulWidget {
+  const MyApp({super.key});
+
   @override
-  _MyAppState createState() => _MyAppState();
+  MyAppState createState() => MyAppState();
 }
 
-class _MyAppState extends State<MyApp> {
+class MyAppState extends State<MyApp> {
   int _currentIndex = 0;
-  final List<Widget> _children = [AskAi(), ExamScreen(), AssessmentScreen()];
+  final List<Widget> _children = [
+    const AskAi(),
+    const ExamScreen(),
+    const AssessmentScreen()
+  ];
 
   void onTabTapped(int index) {
     setState(() {
@@ -40,7 +46,7 @@ class _MyAppState extends State<MyApp> {
           onTap: onTabTapped,
           selectedItemColor: Colors.deepPurple,
           currentIndex: _currentIndex,
-          items: [
+          items: const [
             BottomNavigationBarItem(
               icon: Icon(Icons.question_answer_outlined),
               label: 'Ask Ai',

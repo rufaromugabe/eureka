@@ -1,21 +1,15 @@
 import 'dart:async';
-import 'package:syncfusion_flutter_pdf/pdf.dart';
 import 'dart:io';
+
+import 'package:docx_to_text/docx_to_text.dart';
 import 'package:eureka/main.dart';
-import 'package:permission_handler/permission_handler.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as path;
-import 'package:docx_to_text/docx_to_text.dart';
-import 'package:flutter/material.dart';
-import 'package:file_picker/file_picker.dart';
-
-double lenSliderValue = 50;
-final ImagePicker _picker = ImagePicker();
-XFile? image;
-
-Image? imageFIle = Image.asset('assets/images/placeholder.jpg');
+import 'package:permission_handler/permission_handler.dart';
+import 'package:syncfusion_flutter_pdf/pdf.dart';
 
 class AskAi extends StatefulWidget {
   const AskAi({
@@ -23,10 +17,10 @@ class AskAi extends StatefulWidget {
   });
 
   @override
-  _AskAiState createState() => _AskAiState();
+  AskAiState createState() => AskAiState();
 }
 
-class _AskAiState extends State<AskAi> {
+class AskAiState extends State<AskAi> {
   final _controller = TextEditingController();
   final _controller1 = TextEditingController();
   int askindex = 0;
@@ -68,24 +62,26 @@ class _AskAiState extends State<AskAi> {
         return _response!;
       }
     } catch (e) {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('Connection Error'),
-            content: Text(e.toString()),
-            actions: <Widget>[
-              TextButton(
-                child: Text('Close'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        },
-      );
-      print(e.toString());
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('Connection Error'),
+              content: Text(e.toString()),
+              actions: <Widget>[
+                TextButton(
+                  child: const Text('Close'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      }
+
       return 'Error: ${e.toString()}';
     }
   }
@@ -118,23 +114,25 @@ class _AskAiState extends State<AskAi> {
         String fileContent = await file.readAsString();
         _controller.text = fileContent;
       } else {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text('File Error'),
-              content: Text(" File not Supported"),
-              actions: <Widget>[
-                TextButton(
-                  child: Text('Close'),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-              ],
-            );
-          },
-        );
+        if (mounted) {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Text('File Error'),
+                content: const Text(" File not Supported"),
+                actions: <Widget>[
+                  TextButton(
+                    child: const Text('Close'),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              );
+            },
+          );
+        }
       }
     }
   }
@@ -148,7 +146,7 @@ class _AskAiState extends State<AskAi> {
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: SingleChildScrollView(
-          physics: BouncingScrollPhysics(),
+          physics: const BouncingScrollPhysics(),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -166,6 +164,7 @@ class _AskAiState extends State<AskAi> {
                       width: 80,
                       height: 80,
                       decoration: BoxDecoration(
+                        color: const Color.fromARGB(178, 76, 79, 175),
                         border: Border.all(
                           color: Colors.white,
                           width: 2,
@@ -177,18 +176,18 @@ class _AskAiState extends State<AskAi> {
                         children: [
                           IconButton(
                             tooltip: "Add File",
-                            icon: Icon(Icons
+                            icon: const Icon(Icons
                                 .upload_file_rounded), // replace with your preferred icon
                             onPressed: () {
                               pickAndReadFile();
                             },
                           ),
-                          Text('Add File')
+                          const Text('Add File')
                         ],
                       ),
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     width: 10,
                   ),
                   Expanded(
@@ -204,11 +203,11 @@ class _AskAiState extends State<AskAi> {
                             hintText: 'Enter Documents to Explore ',
                             border: OutlineInputBorder(),
                             hintStyle: TextStyle(color: Colors.black)),
-                        style: TextStyle(color: Colors.black),
+                        style: const TextStyle(color: Colors.black),
                       ),
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     width: 10,
                   ),
                 ],
@@ -233,10 +232,10 @@ class _AskAiState extends State<AskAi> {
                         askindex = 1;
                       });
                     },
-                    icon: Icon(Icons.send)),
+                    icon: const Icon(Icons.send)),
               ]),
               if (askindex == 1) ...[
-                SizedBox(
+                const SizedBox(
                   height: 20,
                 ),
                 Container(
@@ -255,7 +254,7 @@ class _AskAiState extends State<AskAi> {
                   child: SingleChildScrollView(
                     child: Container(
                         child: _loading
-                            ? Column(
+                            ? const Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   CircularProgressIndicator(),

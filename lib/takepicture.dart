@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:camera/camera.dart';
 import 'package:eureka/assessmentscreen.dart';
 import 'package:flutter/material.dart';
@@ -58,21 +59,22 @@ class TakePictureScreenState extends State<TakePictureScreen> {
                             imageFIle = Image.memory(bytes);
                           });
 
+                          // ignore: use_build_context_synchronously
                           Navigator.pop(context, imageFIle);
                         }
                       } catch (e) {
-                        print(e);
+                        //to be done
                       }
                     },
-                    child: Icon(
-                      Icons.camera_alt,
-                      size: 40,
-                    ),
                     style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.lightBlue,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8.0),
-                        )))
+                        )),
+                    child: const Icon(
+                      Icons.camera_alt,
+                      size: 40,
+                    ))
               ],
             );
           } else {

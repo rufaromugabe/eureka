@@ -1,13 +1,14 @@
 import 'dart:io';
-import 'package:syncfusion_flutter_pdf/pdf.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'package:eureka/widgets/custombutton.dart';
-import 'package:eureka/widgets/customdropdown.dart';
-import 'package:path/path.dart' as path;
+
 import 'package:docx_to_text/docx_to_text.dart';
 import 'package:eureka/examhandler.dart';
-import 'package:flutter/material.dart';
+import 'package:eureka/widgets/custombutton.dart';
+import 'package:eureka/widgets/customdropdown.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/material.dart';
+import 'package:path/path.dart' as path;
+import 'package:permission_handler/permission_handler.dart';
+import 'package:syncfusion_flutter_pdf/pdf.dart';
 
 double markSliderValue = 50;
 String typeDropdownValue = 'Multiple Choice';
@@ -52,23 +53,25 @@ class _ExamScreenState extends State<ExamScreen> {
         String fileContent = await file.readAsString();
         _controller.text = fileContent;
       } else {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text('File Error'),
-              content: Text(" File not Supported"),
-              actions: <Widget>[
-                TextButton(
-                  child: Text('Close'),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-              ],
-            );
-          },
-        );
+        if (mounted) {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Text('File Error'),
+                content: const Text(" File not Supported"),
+                actions: <Widget>[
+                  TextButton(
+                    child: const Text('Close'),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              );
+            },
+          );
+        }
       }
     }
   }
@@ -87,19 +90,17 @@ class _ExamScreenState extends State<ExamScreen> {
             const SizedBox(
               height: 5,
             ),
-            Container(
-              child: TextField(
-                maxLines: 8,
-                controller: _controller,
-                decoration: const InputDecoration(
-                    filled: true,
-                    fillColor: Color.fromARGB(148, 255, 255, 255),
-                    hintText:
-                        'Enter Exam Content i.e Course content or Outline ',
-                    border: OutlineInputBorder(),
-                    hintStyle: TextStyle(color: Colors.black)),
-                style: TextStyle(color: Colors.black),
-              ),
+            TextField(
+              maxLines: 8,
+              controller: _controller,
+              decoration: const InputDecoration(
+                  filled: true,
+                  fillColor: Color.fromARGB(148, 255, 255, 255),
+                  hintText:
+                      'Enter Exam Content i.e Course content or Outlines ',
+                  border: OutlineInputBorder(),
+                  hintStyle: TextStyle(color: Colors.black)),
+              style: const TextStyle(color: Colors.black),
             ),
             const SizedBox(
               height: 40,
@@ -115,7 +116,7 @@ class _ExamScreenState extends State<ExamScreen> {
                     ),
                     CustomDropdown(
                       value: typeDropdownValue,
-                      items: [
+                      items: const [
                         'Multiple Choice',
                         'True or False',
                         'Short Answer',
@@ -153,7 +154,7 @@ class _ExamScreenState extends State<ExamScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  Container(
+                  SizedBox(
                     height: 50,
                     child: Expanded(
                       child: Slider(

@@ -1,21 +1,21 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:syncfusion_flutter_pdf/pdf.dart';
+
 import 'package:camera/camera.dart';
-import 'package:permission_handler/permission_handler.dart';
+import 'package:docx_to_text/docx_to_text.dart';
 import 'package:eureka/assessmenthandler.dart';
 import 'package:eureka/takepicture.dart';
 import 'package:eureka/widgets/custombutton.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as path;
-import 'package:docx_to_text/docx_to_text.dart';
-import 'package:flutter/material.dart';
-import 'package:file_picker/file_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:syncfusion_flutter_pdf/pdf.dart';
 
 double lenSliderValue = 50;
 final ImagePicker _picker = ImagePicker();
 XFile? image;
-
 Image? imageFIle = Image.asset('assets/images/placeholder.jpg');
 
 class AssessmentScreen extends StatefulWidget {
@@ -24,10 +24,10 @@ class AssessmentScreen extends StatefulWidget {
   });
 
   @override
-  _AssessmentScreenState createState() => _AssessmentScreenState();
+  AssessmentScreenState createState() => AssessmentScreenState();
 }
 
-class _AssessmentScreenState extends State<AssessmentScreen> {
+class AssessmentScreenState extends State<AssessmentScreen> {
   final _controller = TextEditingController();
 
   Future<void> pickAndReadFile() async {
@@ -58,28 +58,30 @@ class _AssessmentScreenState extends State<AssessmentScreen> {
         String fileContent = await file.readAsString();
         _controller.text = fileContent;
       } else {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text('File Error'),
-              content: Text(" File not Supported"),
-              actions: <Widget>[
-                TextButton(
-                  child: Text('Close'),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-              ],
-            );
-          },
-        );
+        if (mounted) {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Text('File Error'),
+                content: const Text(" File not Supported"),
+                actions: <Widget>[
+                  TextButton(
+                    child: const Text('Close'),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              );
+            },
+          );
+        }
       }
     }
   }
 
-  Future<void> ImagegetCamera() async {
+  Future<void> imageGetCamera(context) async {
     WidgetsFlutterBinding.ensureInitialized();
     final cameras = await availableCameras();
     final firstCamera = cameras.first;
@@ -96,7 +98,7 @@ class _AssessmentScreenState extends State<AssessmentScreen> {
     }
   }
 
-  Future<void> Imageget() async {
+  Future<void> imageGet() async {
     final XFile? selectedImage =
         await _picker.pickImage(source: ImageSource.gallery);
     if (selectedImage != null) {
@@ -107,9 +109,7 @@ class _AssessmentScreenState extends State<AssessmentScreen> {
       setState(() {
         imageFIle = Image.memory(bytes);
       });
-    } else {
-      print('No image selected.');
-    }
+    } else {}
   }
 
   @override
@@ -121,7 +121,7 @@ class _AssessmentScreenState extends State<AssessmentScreen> {
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: SingleChildScrollView(
-          physics: BouncingScrollPhysics(),
+          physics: const BouncingScrollPhysics(),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -130,6 +130,40 @@ class _AssessmentScreenState extends State<AssessmentScreen> {
               ),
               Row(
                 children: [
+                  InkWell(
+                    hoverColor: Colors.deepPurple.withOpacity(0.2),
+                    onTap: () {
+                      pickAndReadFile();
+                    },
+                    child: Container(
+                      width: 80,
+                      height: 100,
+                      decoration: BoxDecoration(
+                        color: const Color.fromARGB(178, 76, 79, 175),
+                        border: Border.all(
+                          color: Colors.white,
+                          width: 2,
+                        ),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          IconButton(
+                            tooltip: "Add File",
+                            icon: const Icon(Icons.upload_file_rounded),
+                            onPressed: () {
+                              pickAndReadFile();
+                            },
+                          ),
+                          const Text('Add File')
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(
+                    width: 10,
+                  ),
                   Expanded(
                     child: Container(
                       alignment: Alignment.center,
@@ -144,44 +178,10 @@ class _AssessmentScreenState extends State<AssessmentScreen> {
                                 'Enter Marking guide or Question content ',
                             border: OutlineInputBorder(),
                             hintStyle: TextStyle(color: Colors.black)),
-                        style: TextStyle(color: Colors.black),
+                        style: const TextStyle(color: Colors.black),
                       ),
                     ),
                   ),
-                  SizedBox(
-                    width: 10,
-                  ),
-                  InkWell(
-                    hoverColor: Colors.deepPurple.withOpacity(0.2),
-                    onTap: () {
-                      pickAndReadFile();
-                    },
-                    child: Container(
-                      width: 80,
-                      height: 100,
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: Colors.white,
-                          width: 2,
-                        ),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          IconButton(
-                            tooltip: "Add File",
-                            icon: Icon(Icons
-                                .upload_file_rounded), // replace with your preferred icon
-                            onPressed: () {
-                              pickAndReadFile();
-                            },
-                          ),
-                          Text('Add File')
-                        ],
-                      ),
-                    ),
-                  )
                 ],
               ),
               const SizedBox(
@@ -203,6 +203,7 @@ class _AssessmentScreenState extends State<AssessmentScreen> {
                           alignment: Alignment.center,
                           height: 200,
                           decoration: BoxDecoration(
+                            color: const Color.fromARGB(148, 255, 255, 255),
                             border: Border.all(
                               color: Colors.deepPurple,
                               width: 5,
@@ -210,7 +211,11 @@ class _AssessmentScreenState extends State<AssessmentScreen> {
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: image == null
-                              ? Center(child: Text('No Image Script Uploaded'))
+                              ? const Center(
+                                  child: Text(
+                                  'No Image Script Uploaded',
+                                  style: TextStyle(color: Colors.black),
+                                ))
                               : Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: imageFIle,
@@ -223,12 +228,13 @@ class _AssessmentScreenState extends State<AssessmentScreen> {
                         children: [
                           InkWell(
                             onTap: () {
-                              Imageget();
+                              imageGet();
                             },
                             child: Container(
                               height: 80,
                               width: 100,
                               decoration: BoxDecoration(
+                                color: const Color.fromARGB(178, 76, 79, 175),
                                 border: Border.all(
                                   color: Colors.white,
                                   width: 2,
@@ -240,25 +246,26 @@ class _AssessmentScreenState extends State<AssessmentScreen> {
                                 children: [
                                   IconButton(
                                     tooltip: "Add Script",
-                                    icon: Icon(Icons
+                                    icon: const Icon(Icons
                                         .image), // replace with your preferred icon
                                     onPressed: () {
-                                      Imageget();
+                                      imageGet();
                                     },
                                   ),
-                                  Text('Add Gallery')
+                                  const Text('Add Gallery')
                                 ],
                               ),
                             ),
                           ),
                           InkWell(
                             onTap: () {
-                              ImagegetCamera();
+                              imageGetCamera(context);
                             },
                             child: Container(
                               height: 80,
                               width: 100,
                               decoration: BoxDecoration(
+                                color: const Color.fromARGB(178, 76, 79, 175),
                                 border: Border.all(
                                   color: Colors.white,
                                   width: 2,
@@ -270,13 +277,12 @@ class _AssessmentScreenState extends State<AssessmentScreen> {
                                 children: [
                                   IconButton(
                                     tooltip: "Add Script",
-                                    icon: Icon(Icons
-                                        .image), // replace with your preferred icon
+                                    icon: const Icon(Icons.image),
                                     onPressed: () {
-                                      ImagegetCamera();
+                                      imageGetCamera(context);
                                     },
                                   ),
-                                  Text('Add Camera')
+                                  const Text('Add Camera')
                                 ],
                               ),
                             ),
@@ -287,7 +293,7 @@ class _AssessmentScreenState extends State<AssessmentScreen> {
                   ],
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 30,
               ),
               Row(

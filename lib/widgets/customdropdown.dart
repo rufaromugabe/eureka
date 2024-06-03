@@ -5,8 +5,11 @@ class CustomDropdown extends StatelessWidget {
   final List<String> items;
   final ValueChanged<String?> onChanged;
 
-  CustomDropdown(
-      {required this.value, required this.items, required this.onChanged});
+  const CustomDropdown(
+      {super.key,
+      required this.value,
+      required this.items,
+      required this.onChanged});
 
   @override
   Widget build(BuildContext context) {
@@ -14,11 +17,11 @@ class CustomDropdown extends StatelessWidget {
       value: value,
       iconSize: 24,
       elevation: 10,
-      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 1),
-      borderRadius: BorderRadius.all(Radius.circular(20)),
-      focusColor: Color.fromARGB(255, 1, 4, 19),
-      dropdownColor: Color.fromARGB(255, 1, 4, 19),
-      underline: Container(decoration: BoxDecoration(color: Colors.blue)),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 1),
+      borderRadius: const BorderRadius.all(Radius.circular(20)),
+      focusColor: const Color.fromARGB(255, 1, 4, 19),
+      dropdownColor: const Color.fromARGB(255, 1, 4, 19),
+      underline: Container(decoration: const BoxDecoration(color: Colors.blue)),
       items: items.map<DropdownMenuItem<String>>((String value) {
         return DropdownMenuItem<String>(
           value: value,

@@ -1,9 +1,10 @@
 import 'dart:convert';
+
 import 'package:eureka/assessmentscreen.dart';
 import 'package:eureka/main.dart';
 import 'package:flutter/material.dart';
-import 'package:percent_indicator/percent_indicator.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
+import 'package:percent_indicator/percent_indicator.dart';
 
 class AssessmentOut extends StatefulWidget {
   const AssessmentOut({
@@ -21,9 +22,9 @@ class _AssessmentOutState extends State<AssessmentOut> {
   String? _response = "";
   bool _isLoading = false;
   Image? imageFIle = Image.asset('assets/images/placeholder.jpg');
-  late final GenerationConfig _Config;
+  late final GenerationConfig _config;
   int assesindex = 0;
-  late final GenerativeModel _Model;
+  late final GenerativeModel _model;
   String? mark;
   String? comment;
 
@@ -33,18 +34,18 @@ class _AssessmentOutState extends State<AssessmentOut> {
   @override
   void initState() {
     super.initState();
-    _Config = GenerationConfig(
+    _config = GenerationConfig(
         temperature: 1,
         topP: 0.95,
         topK: 64,
         maxOutputTokens: 8192,
         responseMimeType: "application/json");
-    _Model = GenerativeModel(
+    _model = GenerativeModel(
       model: 'gemini-1.5-pro-latest',
       apiKey: apiKey,
-      generationConfig: _Config,
+      generationConfig: _config,
       systemInstruction: Content.text(
-          'You are a an Ai marker you have ${lenSliderValue.round()} % Leniency and you return Json of marks as a percentage  in this format {mark: 80, comment: "Good work"} , also make comprehensive comments and use marking guide if attached'),
+          'You are a an Ai marker you have ${lenSliderValue.round()} % Leniency and you return Json of marks  as a percentage  in this format {mark: 80, comment: "Good work"} , also make comprehensive comments and use marking guide if attached mark as text what is in the image'),
     );
   }
 
@@ -61,7 +62,7 @@ class _AssessmentOutState extends State<AssessmentOut> {
         ];
         _generatedContent
             .add((image: Image.memory(bytes), text: message, fromUser: true));
-        var response = await _Model.generateContent(content);
+        var response = await _model.generateContent(content);
         imageFIle = Image.memory(bytes);
         var text = response.text;
         _response = response.text;
@@ -82,7 +83,7 @@ class _AssessmentOutState extends State<AssessmentOut> {
         }
       } else {}
     } catch (e) {
-      print(e.toString());
+      //do nothing
     }
   }
 
@@ -90,7 +91,7 @@ class _AssessmentOutState extends State<AssessmentOut> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Assessement'),
+        title: const Text('Assessement'),
       ),
       body: Center(
         child: Row(
@@ -103,7 +104,7 @@ class _AssessmentOutState extends State<AssessmentOut> {
                   if (assesindex == 0) ...[
                     Center(
                       child: _isLoading
-                          ? CircularProgressIndicator()
+                          ? const CircularProgressIndicator()
                           : ElevatedButton(
                               onPressed: () async {
                                 setState(() {
@@ -116,17 +117,30 @@ class _AssessmentOutState extends State<AssessmentOut> {
                                 });
                               },
                               style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors
-                                      .deepPurple // This is the button color
-                                  ),
+                                padding: const EdgeInsets.all(8.0),
+                                backgroundColor: Colors.deepPurple,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                              ),
                               child: _isLoading
-                                  ? CircularProgressIndicator()
-                                  : Text('Mark Assessment'),
-                            ),
+                                  ? const CircularProgressIndicator()
+                                  : const SizedBox(
+                                      width: 150,
+                                      height: 40,
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Icon(Icons.generating_tokens),
+                                          Text('Mark Script'),
+                                        ],
+                                      ),
+                                    )),
                     )
                   ],
                   if (assesindex == 1) ...[
-                    SizedBox(
+                    const SizedBox(
                       height: 20,
                     ),
                     Flexible(
@@ -151,7 +165,7 @@ class _AssessmentOutState extends State<AssessmentOut> {
                                   color: Colors.white.withOpacity(0.1),
                                   spreadRadius: 5,
                                   blurRadius: 7,
-                                  offset: Offset(0, 3),
+                                  offset: const Offset(0, 3),
                                 ),
                               ],
                             ),
@@ -170,7 +184,7 @@ class _AssessmentOutState extends State<AssessmentOut> {
                                 percent: double.parse(mark!) / 100,
                                 center: Text(
                                   "$mark%",
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 20.0),
                                 ),
@@ -185,7 +199,7 @@ class _AssessmentOutState extends State<AssessmentOut> {
                                       color: Colors.white.withOpacity(0.1),
                                       spreadRadius: 5,
                                       blurRadius: 7,
-                                      offset: Offset(
+                                      offset: const Offset(
                                           0, 3), // changes position of shadow
                                     ),
                                   ],
