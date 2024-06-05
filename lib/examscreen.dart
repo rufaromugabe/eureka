@@ -11,6 +11,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 
 double markSliderValue = 50;
+double qsnSliderValue = 10;
 String typeDropdownValue = 'Multiple Choice';
 String strengthDropdownValue = 'Easy';
 
@@ -83,123 +84,179 @@ class _ExamScreenState extends State<ExamScreen> {
       appBar: AppBar(
         title: const Text('Exam Generator'),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(20.0),
+      body: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
         child: Column(
           children: [
             const SizedBox(
               height: 5,
             ),
-            TextField(
-              maxLines: 8,
-              controller: _controller,
-              decoration: const InputDecoration(
+            SizedBox(
+              height: 300,
+              width: MediaQuery.of(context).size.width / 1.1,
+              child: TextField(
+                maxLines: 8,
+                controller: _controller,
+                decoration: const InputDecoration(
                   filled: true,
                   fillColor: Color.fromARGB(148, 255, 255, 255),
                   hintText:
                       'Enter Exam Content i.e Course content or Outlines ',
                   border: OutlineInputBorder(),
-                  hintStyle: TextStyle(color: Colors.black)),
-              style: const TextStyle(color: Colors.black),
+                  hintStyle: TextStyle(color: Colors.black),
+                ),
+                style: const TextStyle(color: Colors.black),
+              ),
             ),
             const SizedBox(
-              height: 40,
+              height: 10,
             ),
             Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Type: ',
-                      style: TextStyle(fontSize: 16),
-                    ),
-                    CustomDropdown(
-                      value: typeDropdownValue,
-                      items: const [
-                        'Multiple Choice',
-                        'True or False',
-                        'Short Answer',
-                        'Essay'
-                      ],
-                      onChanged: (String? newValue) {
-                        setState(() {
-                          typeDropdownValue = newValue!;
-                        });
-                      },
-                    )
-                  ],
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Strength: ',
-                      style: TextStyle(fontSize: 16),
-                    ),
-                    CustomDropdown(
-                      value: strengthDropdownValue,
-                      items: const ['Very Easy', 'Easy', 'Hard', 'Very Hard'],
-                      onChanged: (String? newValue) {
-                        setState(() {
-                          strengthDropdownValue = newValue!;
-                        });
-                      },
-                    )
-                  ],
-                ),
-              ],
-            ),
-            Expanded(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  SizedBox(
-                    height: 50,
-                    child: Expanded(
-                      child: Slider(
-                        value: markSliderValue,
-                        min: 0,
-                        max: 100,
-                        divisions: 100,
-                        onChanged: (double value) {
+                SizedBox(
+                  height: 80,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Type: ',
+                        style: TextStyle(fontSize: 16),
+                      ),
+                      CustomDropdown(
+                        value: typeDropdownValue,
+                        items: const [
+                          'Multiple Choice',
+                          'True or False',
+                          'Short Answer',
+                          'Essay'
+                        ],
+                        onChanged: (String? newValue) {
                           setState(() {
-                            markSliderValue = value;
+                            typeDropdownValue = newValue!;
                           });
                         },
                       ),
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  height: 80,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Strength: ',
+                        style: TextStyle(fontSize: 16),
+                      ),
+                      CustomDropdown(
+                        value: strengthDropdownValue,
+                        items: const ['Very Easy', 'Easy', 'Hard', 'Very Hard'],
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            strengthDropdownValue = newValue!;
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: SizedBox(
+                    height: 40,
+                    width: 220,
+                    child: Slider(
+                      value: markSliderValue,
+                      min: 1,
+                      max: 100,
+                      divisions: 100,
+                      onChanged: (double value) {
+                        setState(() {
+                          markSliderValue = value;
+                        });
+                      },
                     ),
                   ),
-                  Text(
-                    ' ${markSliderValue.round()} Marks',
-                    style: const TextStyle(fontSize: 16),
-                  ),
-                ],
-              ),
+                ),
+                Text(
+                  ' ${markSliderValue.round()} Marks ',
+                  style: const TextStyle(fontSize: 15),
+                ),
+              ],
             ),
-            Flexible(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  CustomButton(
-                      icon: Icons.file_upload,
-                      text: 'Upload',
-                      onPressed: () {
-                        pickAndReadFile();
-                      }),
-                  CustomButton(
-                      icon: Icons.navigate_next,
-                      text: 'Continue',
-                      onPressed: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                Examout(text: _controller.text),
-                          ),
-                        );
-                      })
-                ],
-              ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: SizedBox(
+                    height: 40,
+                    width: 220,
+                    child: Slider(
+                      label: 'Questions',
+                      value: qsnSliderValue.clamp(
+                          2.0,
+                          typeDropdownValue == "Essay"
+                              ? 10.0
+                              : (typeDropdownValue == "Short Answer"
+                                  ? 30.0
+                                  : 50.0)),
+                      min: 2,
+                      max: typeDropdownValue == "Essay"
+                          ? 10
+                          : (typeDropdownValue == "Short Answer" ? 30 : 50),
+                      divisions: 100,
+                      onChanged: (double value) {
+                        setState(() {
+                          qsnSliderValue = value.clamp(
+                              2.0,
+                              typeDropdownValue == "Essay"
+                                  ? 10.0
+                                  : (typeDropdownValue == "Short Answer"
+                                      ? 30.0
+                                      : 50.0));
+                        });
+                      },
+                    ),
+                  ),
+                ),
+                Text(
+                  ' ${qsnSliderValue.round()} Qtns  ',
+                  style: const TextStyle(fontSize: 15),
+                ),
+              ],
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                CustomButton(
+                  icon: Icons.file_upload,
+                  text: 'Upload',
+                  onPressed: () {
+                    pickAndReadFile();
+                  },
+                ),
+                CustomButton(
+                  icon: Icons.navigate_next,
+                  text: 'Continue',
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => Examout(text: _controller.text),
+                      ),
+                    );
+                  },
+                ),
+              ],
             ),
           ],
         ),

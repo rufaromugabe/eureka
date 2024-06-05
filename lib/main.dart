@@ -36,7 +36,15 @@ class MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: ThemeData.dark(useMaterial3: true),
+      theme: ThemeData.dark(useMaterial3: true).copyWith(
+        scaffoldBackgroundColor: const Color.fromARGB(255, 2, 1, 16),
+        appBarTheme: const AppBarTheme(
+          color: Color.fromARGB(255, 2, 1, 16),
+        ),
+        bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+          backgroundColor: Color.fromARGB(255, 2, 1, 16),
+        ),
+      ),
       home: Scaffold(
         body: IndexedStack(
           index: _currentIndex,

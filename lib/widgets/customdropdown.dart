@@ -21,7 +21,6 @@ class CustomDropdown extends StatelessWidget {
       borderRadius: const BorderRadius.all(Radius.circular(20)),
       focusColor: const Color.fromARGB(255, 1, 4, 19),
       dropdownColor: const Color.fromARGB(255, 1, 4, 19),
-      underline: Container(decoration: const BoxDecoration(color: Colors.blue)),
       items: items.map<DropdownMenuItem<String>>((String value) {
         return DropdownMenuItem<String>(
           value: value,

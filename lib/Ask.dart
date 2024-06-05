@@ -166,7 +166,6 @@ class AskAiState extends State<AskAi> {
                       decoration: BoxDecoration(
                         color: const Color.fromARGB(178, 76, 79, 175),
                         border: Border.all(
-                          color: Colors.white,
                           width: 2,
                         ),
                         borderRadius: BorderRadius.circular(8),
@@ -176,8 +175,7 @@ class AskAiState extends State<AskAi> {
                         children: [
                           IconButton(
                             tooltip: "Add File",
-                            icon: const Icon(Icons
-                                .upload_file_rounded), // replace with your preferred icon
+                            icon: const Icon(Icons.upload_file_rounded),
                             onPressed: () {
                               pickAndReadFile();
                             },

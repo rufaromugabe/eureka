@@ -31,7 +31,7 @@ class _ExamoutState extends State<Examout> {
       model: 'gemini-1.5-pro-latest',
       apiKey: apiKey,
       systemInstruction: Content.text((guidindex == 0
-          ? 'Write exam questions for the topic(s) with ${markSliderValue.round()} marks and the Question types should be set as $typeDropdownValue. The exam should be $strengthDropdownValue. Give instructions to the students.'
+          ? 'Write exam questions for the topic(s) with ${markSliderValue.round()} marks, ${qsnSliderValue.round()}Questions and the Question types should be set as $typeDropdownValue. The exam should be $strengthDropdownValue. Give instructions to the students. Questions may carry diffirent marks'
           : 'Give the Marking guide for the Exam above')),
     );
     _chat = _model.startChat();

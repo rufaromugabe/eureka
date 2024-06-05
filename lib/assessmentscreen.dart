@@ -140,10 +140,6 @@ class AssessmentScreenState extends State<AssessmentScreen> {
                       height: 100,
                       decoration: BoxDecoration(
                         color: const Color.fromARGB(178, 76, 79, 175),
-                        border: Border.all(
-                          color: Colors.white,
-                          width: 2,
-                        ),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Column(
@@ -189,10 +185,7 @@ class AssessmentScreenState extends State<AssessmentScreen> {
               ),
               Container(
                 decoration: BoxDecoration(
-                  border: Border.all(
-                    color: Colors.white,
-                    width: 2,
-                  ),
+                  color: const Color.fromARGB(255, 12, 6, 26),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Column(
@@ -204,10 +197,6 @@ class AssessmentScreenState extends State<AssessmentScreen> {
                           height: 200,
                           decoration: BoxDecoration(
                             color: const Color.fromARGB(148, 255, 255, 255),
-                            border: Border.all(
-                              color: Colors.deepPurple,
-                              width: 5,
-                            ),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: image == null
@@ -235,10 +224,6 @@ class AssessmentScreenState extends State<AssessmentScreen> {
                               width: 100,
                               decoration: BoxDecoration(
                                 color: const Color.fromARGB(178, 76, 79, 175),
-                                border: Border.all(
-                                  color: Colors.white,
-                                  width: 2,
-                                ),
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Column(
@@ -266,10 +251,6 @@ class AssessmentScreenState extends State<AssessmentScreen> {
                               width: 100,
                               decoration: BoxDecoration(
                                 color: const Color.fromARGB(178, 76, 79, 175),
-                                border: Border.all(
-                                  color: Colors.white,
-                                  width: 2,
-                                ),
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Column(
