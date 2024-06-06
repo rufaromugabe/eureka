@@ -19,11 +19,10 @@ class ExamScreen extends StatefulWidget {
   const ExamScreen({super.key});
 
   @override
-  // ignore: library_private_types_in_public_api
-  _ExamScreenState createState() => _ExamScreenState();
+  ExamScreenState createState() => ExamScreenState();
 }
 
-class _ExamScreenState extends State<ExamScreen> {
+class ExamScreenState extends State<ExamScreen> {
   final _controller = TextEditingController();
 
   Future<void> pickAndReadFile() async {

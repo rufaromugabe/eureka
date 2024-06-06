@@ -49,7 +49,7 @@ class AskAiState extends State<AskAi> {
         apiKey: apiKey,
         generationConfig: _config,
         systemInstruction: Content.text(
-            'When responding to a prompt, suggest 10 short search queries related to the data provided only. return the queries in the format of Json list [{suggest: "Summerize document"}, {suggest:"Evaluate the ANOVA"}, {suggest:"Get timeline of budget"}]'));
+            'When responding to a prompt, suggest 10 shortest search queries related to the data provided only. return the queries in the format of Json list [{suggest: "Summerize document"}, {suggest:"Evaluate the ANOVA"}, {suggest:"Get timeline of budget"}]'));
     _model = GenerativeModel(
       model: 'gemini-1.5-pro-latest',
       apiKey: apiKey,
@@ -59,7 +59,7 @@ class AskAiState extends State<AskAi> {
   }
 
   void _getSuggestions(String text) async {
-    if (text.startsWith('@') && _controller.text != "") {
+    if ((text.startsWith('@') && _controller.text != "")) {
       try {
         final hintresponse =
             await _hintmodel.generateContent([Content.text(_controller.text)]);
@@ -99,7 +99,7 @@ class AskAiState extends State<AskAi> {
           );
         }
       }
-    } else if (text.startsWith('@')) {
+    } else {
       _suggestions = [];
     }
     setState(() {});
@@ -140,6 +140,9 @@ class AskAiState extends State<AskAi> {
             );
           },
         );
+        setState(() {
+          _loading = false;
+        });
       }
 
       return 'Error: ${e.toString()}';
@@ -166,13 +169,17 @@ class AskAiState extends State<AskAi> {
         String text = PdfTextExtractor(document).extractText();
         document.dispose();
         _controller.text = text;
+        _getSuggestions('@');
       } else if (extension == '.docx') {
         final bytes = await file.readAsBytes();
         final fileContent = docxToText(bytes);
         _controller.text = fileContent;
+        _getSuggestions('@');
       } else if (extension == '.txt') {
         String fileContent = await file.readAsString();
         _controller.text = fileContent;
+
+        _getSuggestions('@');
       } else {
         if (mounted) {
           showDialog(
@@ -255,6 +262,7 @@ class AskAiState extends State<AskAi> {
                       child: TextField(
                         maxLines: 10,
                         controller: _controller,
+                        onChanged: (text) => _getSuggestions(text),
                         decoration: const InputDecoration(
                             filled: true,
                             fillColor: Color.fromARGB(148, 255, 255, 255),
@@ -277,6 +285,7 @@ class AskAiState extends State<AskAi> {
                 Expanded(
                   child: TextField(
                     controller: _controller1,
+                    onTap: _controller1.clear,
                     onChanged: (text) => _getSuggestions(text),
                     decoration: const InputDecoration(
                       hintText: 'Ask your document',
@@ -291,7 +300,6 @@ class AskAiState extends State<AskAi> {
                       getResponse("${_controller1.text} from $data");
                       askindex = 1;
                       FocusScope.of(context).unfocus();
-                      _controller1.clear();
                     });
                   },
                   icon: const Icon(Icons.send),
@@ -299,17 +307,23 @@ class AskAiState extends State<AskAi> {
               ]),
               if (_suggestions.isNotEmpty) ...[
                 const SizedBox(height: 10),
-                Wrap(
-                  children: _suggestions
-                      .map((suggestion) => FilterChip(
-                            label: Text(suggestion),
-                            onSelected: (selected) {
-                              _controller1.text = suggestion;
-                              _suggestions = [];
-                              setState(() {});
-                            },
-                          ))
-                      .toList(),
+                SizedBox(
+                  height: 150, // specify the height of the GridView
+                  child: GridView.count(
+                    scrollDirection: Axis.horizontal,
+                    crossAxisCount: 3, // specify the number of columns
+                    childAspectRatio: 0.2, // adjust the aspect ratio as needed
+                    children: _suggestions
+                        .map((suggestion) => FilterChip(
+                              label: Text(suggestion),
+                              onSelected: (selected) {
+                                _controller1.text = suggestion;
+                                _suggestions = [];
+                                setState(() {});
+                              },
+                            ))
+                        .toList(),
+                  ),
                 ),
               ],
               if (askindex == 1) ...[
@@ -322,7 +336,7 @@ class AskAiState extends State<AskAi> {
                   constraints: const BoxConstraints(maxWidth: 800),
                   decoration: BoxDecoration(
                     color: const Color.fromARGB(255, 24, 2, 61),
-                    borderRadius: BorderRadius.circular(18),
+                    borderRadius: BorderRadius.circular(8.0),
                   ),
                   padding: const EdgeInsets.symmetric(
                     vertical: 15,
