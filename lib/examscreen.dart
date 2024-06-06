@@ -11,7 +11,6 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 
 double markSliderValue = 50;
-double qsnSliderValue = 10;
 String typeDropdownValue = 'Multiple Choice';
 String strengthDropdownValue = 'Easy';
 
@@ -114,7 +113,7 @@ class ExamScreenState extends State<ExamScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 SizedBox(
-                  height: 80,
+                  height: 100,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -140,7 +139,7 @@ class ExamScreenState extends State<ExamScreen> {
                   ),
                 ),
                 SizedBox(
-                  height: 80,
+                  height: 100,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -189,50 +188,8 @@ class ExamScreenState extends State<ExamScreen> {
                 ),
               ],
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: SizedBox(
-                    height: 40,
-                    width: 220,
-                    child: Slider(
-                      label: 'Questions',
-                      value: qsnSliderValue.clamp(
-                          2.0,
-                          typeDropdownValue == "Essay"
-                              ? 10.0
-                              : (typeDropdownValue == "Short Answer"
-                                  ? 30.0
-                                  : 50.0)),
-                      min: 2,
-                      max: typeDropdownValue == "Essay"
-                          ? 10
-                          : (typeDropdownValue == "Short Answer" ? 30 : 50),
-                      divisions: 100,
-                      onChanged: (double value) {
-                        setState(() {
-                          qsnSliderValue = value.clamp(
-                              2.0,
-                              typeDropdownValue == "Essay"
-                                  ? 10.0
-                                  : (typeDropdownValue == "Short Answer"
-                                      ? 30.0
-                                      : 50.0));
-                        });
-                      },
-                    ),
-                  ),
-                ),
-                Text(
-                  ' ${qsnSliderValue.round()} Qtns  ',
-                  style: const TextStyle(fontSize: 15),
-                ),
-              ],
-            ),
             const SizedBox(
-              height: 10,
+              height: 20,
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,

@@ -144,69 +144,68 @@ class _AssessmentOutState extends State<AssessmentOut> {
                       height: 20,
                     ),
                     Flexible(
-                      child: Container(
-                        constraints: const BoxConstraints(maxWidth: 800),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.white),
-                          borderRadius: BorderRadius.circular(18),
-                        ),
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 15,
-                          horizontal: 20,
-                        ),
-                        margin: const EdgeInsets.only(bottom: 8),
-                        child: SingleChildScrollView(
-                            child: Column(children: [
-                          Container(
-                            height: 360,
-                            decoration: BoxDecoration(
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.white.withOpacity(0.1),
-                                  spreadRadius: 5,
-                                  blurRadius: 7,
-                                  offset: const Offset(0, 3),
-                                ),
-                              ],
-                            ),
-                            child: imageFIle!,
+                      child: Padding(
+                        padding: const EdgeInsets.all(5.0),
+                        child: Container(
+                          constraints: const BoxConstraints(maxWidth: 800),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.white),
+                            borderRadius: BorderRadius.circular(10),
                           ),
-                          const SizedBox(
-                            height: 2,
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 15,
+                            horizontal: 20,
                           ),
-                          if (mark != null && comment != null) ...[
-                            Padding(
-                              padding: const EdgeInsets.all(30.0),
-                              child: CircularPercentIndicator(
-                                radius: 50.0,
-                                lineWidth: 13.0,
-                                animation: true,
-                                percent: double.parse(mark!) / 100,
-                                center: Text(
-                                  "$mark%",
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 20.0),
-                                ),
-                                circularStrokeCap: CircularStrokeCap.round,
-                                progressColor: Colors.green,
-                              ),
-                            ),
+                          margin: const EdgeInsets.only(bottom: 8),
+                          child: SingleChildScrollView(
+                              child: Column(children: [
                             Container(
-                                decoration: BoxDecoration(
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.white.withOpacity(0.1),
-                                      spreadRadius: 5,
-                                      blurRadius: 7,
-                                      offset: const Offset(
-                                          0, 3), // changes position of shadow
-                                    ),
-                                  ],
+                              height: 360,
+                              decoration: BoxDecoration(
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.white.withOpacity(0.1),
+                                    spreadRadius: 5,
+                                    blurRadius: 7,
+                                    offset: const Offset(0, 3),
+                                  ),
+                                ],
+                              ),
+                              child: imageFIle!,
+                            ),
+                            const SizedBox(
+                              height: 2,
+                            ),
+                            if (mark != null && comment != null) ...[
+                              Padding(
+                                padding: const EdgeInsets.all(30.0),
+                                child: CircularPercentIndicator(
+                                  radius: 50.0,
+                                  lineWidth: 13.0,
+                                  animation: true,
+                                  percent: double.parse(mark!) / 100,
+                                  center: Text(
+                                    "$mark%",
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 20.0),
+                                  ),
+                                  circularStrokeCap: CircularStrokeCap.round,
+                                  progressColor: Colors.green,
                                 ),
-                                child: Text(comment!)),
-                          ]
-                        ])),
+                              ),
+                              Container(
+                                  decoration: BoxDecoration(
+                                    color: const Color.fromARGB(255, 24, 2, 61),
+                                    borderRadius: BorderRadius.circular(8.0),
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Text(comment!),
+                                  )),
+                            ]
+                          ])),
+                        ),
                       ),
                     )
                   ]

@@ -31,7 +31,7 @@ class _ExamoutState extends State<Examout> {
       model: 'gemini-1.5-pro-latest',
       apiKey: apiKey,
       systemInstruction: Content.text((guidindex == 0
-          ? 'Write exam questions for the topic(s) with ${markSliderValue.round()} marks, ${qsnSliderValue.round()}Questions and the Question types should be set as $typeDropdownValue. The exam should be $strengthDropdownValue. Give instructions to the students. Questions may carry diffirent marks'
+          ? 'Write exam questions for the topic(s) with ${markSliderValue.round()} marks, the Questions type should be set as $typeDropdownValue. The exam should be $strengthDropdownValue. Give instructions to the students. Questions may carry diffirent marks'
           : 'Give the Marking guide for the Exam above')),
     );
     _chat = _model.startChat();
@@ -85,7 +85,7 @@ class _ExamoutState extends State<Examout> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('My Exam'),
+        title: const Text('My Exam Paper'),
       ),
       body: Center(
         child: examindex == 0
@@ -133,85 +133,88 @@ class _ExamoutState extends State<Examout> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   Flexible(
-                    child: Container(
-                      constraints: const BoxConstraints(maxWidth: 800),
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.white),
-                        borderRadius: BorderRadius.circular(18),
-                      ),
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 15,
-                        horizontal: 20,
-                      ),
-                      margin: const EdgeInsets.only(bottom: 8),
-                      child: SingleChildScrollView(
-                        child: Column(
-                          children: [
-                            if (examindex == 1) ...[
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  CustomButton(
-                                    text: 'Copy',
-                                    icon: Icons.copy,
-                                    onPressed: () {
-                                      setState(() {
-                                        String markdown =
-                                            _response!.replaceAll('**', '');
-                                        String markdownTable = markdown;
-                                        String plainTextTable = markdownTable
-                                            .replaceAll('|', '\t')
-                                            .replaceAll('---', '');
-                                        Clipboard.setData(ClipboardData(
-                                            text: plainTextTable));
-                                      });
-                                    },
-                                  ),
-                                  ElevatedButton(
-                                    onPressed: () {
-                                      setState(() {
-                                        guidindex = 1;
-                                        _chatFuture = getExam(
-                                            'Give the Marking guide for the Exam above');
-                                      });
-                                      Clipboard.setData(
-                                          ClipboardData(text: _response!));
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                      padding: const EdgeInsets.all(8.0),
-                                      backgroundColor: Colors.deepPurple,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(8.0),
-                                      ),
-                                    ),
-                                    child: FutureBuilder<String>(
-                                      future: _chatFuture,
-                                      builder: (BuildContext context,
-                                          AsyncSnapshot<String> snapshot) {
-                                        if (snapshot.connectionState ==
-                                            ConnectionState.waiting) {
-                                          return const CircularProgressIndicator();
-                                        } else {
-                                          return const Row(
-                                            children: [
-                                              Icon(Icons
-                                                  .question_answer_outlined),
-                                              Text('Marking guild'),
-                                            ],
-                                          );
-                                        }
+                    child: Padding(
+                      padding: const EdgeInsets.all(5.0),
+                      child: Container(
+                        constraints: const BoxConstraints(maxWidth: 800),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.white),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 15,
+                          horizontal: 20,
+                        ),
+                        margin: const EdgeInsets.only(bottom: 8),
+                        child: SingleChildScrollView(
+                          child: Column(
+                            children: [
+                              if (examindex == 1) ...[
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    CustomButton(
+                                      text: 'Copy',
+                                      icon: Icons.copy,
+                                      onPressed: () {
+                                        setState(() {
+                                          String markdown =
+                                              _response!.replaceAll('**', '');
+                                          String markdownTable = markdown;
+                                          String plainTextTable = markdownTable
+                                              .replaceAll('|', '\t')
+                                              .replaceAll('---', '');
+                                          Clipboard.setData(ClipboardData(
+                                              text: plainTextTable));
+                                        });
                                       },
                                     ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 20),
-                              MarkdownBody(data: _response!),
-                            ] else
-                              ...[]
-                          ],
+                                    ElevatedButton(
+                                      onPressed: () {
+                                        setState(() {
+                                          guidindex = 1;
+                                          _chatFuture = getExam(
+                                              'Give the Marking guide for the Exam above');
+                                        });
+                                        Clipboard.setData(
+                                            ClipboardData(text: _response!));
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        padding: const EdgeInsets.all(8.0),
+                                        backgroundColor: Colors.deepPurple,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(8.0),
+                                        ),
+                                      ),
+                                      child: FutureBuilder<String>(
+                                        future: _chatFuture,
+                                        builder: (BuildContext context,
+                                            AsyncSnapshot<String> snapshot) {
+                                          if (snapshot.connectionState ==
+                                              ConnectionState.waiting) {
+                                            return const CircularProgressIndicator();
+                                          } else {
+                                            return const Row(
+                                              children: [
+                                                Icon(Icons
+                                                    .question_answer_outlined),
+                                                Text('Marking guide'),
+                                              ],
+                                            );
+                                          }
+                                        },
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 20),
+                                MarkdownBody(data: _response!),
+                              ] else
+                                ...[]
+                            ],
+                          ),
                         ),
                       ),
                     ),
