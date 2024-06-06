@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:docx_to_text/docx_to_text.dart';
@@ -25,22 +26,83 @@ class AskAiState extends State<AskAi> {
   final _controller1 = TextEditingController();
   int askindex = 0;
   String? _response = "";
+  String? _hintresponse = "";
   String data = "no data provided please upload a content";
   late final GenerativeModel _model;
-  late final ChatSession _chat;
+  late final GenerativeModel _hintmodel;
+  late final GenerationConfig _config;
+  List<String> _suggestions = [];
 
   bool _loading = false;
 
   @override
   void initState() {
     super.initState();
+    _config = GenerationConfig(
+        temperature: 1.2,
+        topP: 0.9,
+        topK: 128,
+        maxOutputTokens: 256,
+        responseMimeType: "application/json");
+    _hintmodel = GenerativeModel(
+        model: 'gemini-1.5-flash-latest',
+        apiKey: apiKey,
+        generationConfig: _config,
+        systemInstruction: Content.text(
+            'When responding to a prompt, suggest 10 short search queries related to the data provided only. return the queries in the format of Json list [{suggest: "Summerize document"}, {suggest:"Evaluate the ANOVA"}, {suggest:"Get timeline of budget"}]'));
     _model = GenerativeModel(
       model: 'gemini-1.5-pro-latest',
       apiKey: apiKey,
       systemInstruction: Content.text(
           "Use this data provided as your knowledge to respond to all questions strictly "),
     );
-    _chat = _model.startChat();
+  }
+
+  void _getSuggestions(String text) async {
+    if (text.startsWith('@') && _controller.text != "") {
+      try {
+        final hintresponse =
+            await _hintmodel.generateContent([Content.text(_controller.text)]);
+        _hintresponse = hintresponse.text;
+        if (_hintresponse != null) {
+          List<dynamic> decodedResponse =
+              json.decode(_hintresponse!) as List<dynamic>;
+          _suggestions = decodedResponse
+              .map((item) => item as Map<String, dynamic>)
+              .map((item) => item['suggest'])
+              .toList()
+              .cast<String>();
+          setState(() {
+            FocusScope.of(context).unfocus();
+          });
+        } else {
+          _suggestions = [];
+        }
+      } catch (e) {
+        if (mounted) {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Text('Connection Error'),
+                content: Text(e.toString()),
+                actions: <Widget>[
+                  TextButton(
+                    child: const Text('Close'),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              );
+            },
+          );
+        }
+      }
+    } else if (text.startsWith('@')) {
+      _suggestions = [];
+    }
+    setState(() {});
   }
 
   Future<String> getResponse(String message) async {
@@ -48,9 +110,7 @@ class AskAiState extends State<AskAi> {
       _loading = true;
     });
     try {
-      final response = await _chat.sendMessage(
-        Content.text(message),
-      );
+      final response = await _model.generateContent([Content.text(message)]);
       _response = response.text;
 
       if (_response == null) {
@@ -191,7 +251,7 @@ class AskAiState extends State<AskAi> {
                   Expanded(
                     child: Container(
                       alignment: Alignment.center,
-                      height: 100,
+                      height: 80,
                       child: TextField(
                         maxLines: 10,
                         controller: _controller,
@@ -217,31 +277,51 @@ class AskAiState extends State<AskAi> {
                 Expanded(
                   child: TextField(
                     controller: _controller1,
+                    onChanged: (text) => _getSuggestions(text),
                     decoration: const InputDecoration(
-                        hintText: 'Ask your document',
-                        border: OutlineInputBorder()),
+                      hintText: 'Ask your document',
+                      border: OutlineInputBorder(),
+                    ),
                   ),
                 ),
                 IconButton(
-                    onPressed: () {
-                      setState(() {
-                        data = _controller.text;
-                        getResponse("${_controller1.text} from $data");
-                        askindex = 1;
-                      });
-                    },
-                    icon: const Icon(Icons.send)),
+                  onPressed: () {
+                    setState(() {
+                      data = _controller.text;
+                      getResponse("${_controller1.text} from $data");
+                      askindex = 1;
+                      FocusScope.of(context).unfocus();
+                      _controller1.clear();
+                    });
+                  },
+                  icon: const Icon(Icons.send),
+                ),
               ]),
+              if (_suggestions.isNotEmpty) ...[
+                const SizedBox(height: 10),
+                Wrap(
+                  children: _suggestions
+                      .map((suggestion) => FilterChip(
+                            label: Text(suggestion),
+                            onSelected: (selected) {
+                              _controller1.text = suggestion;
+                              _suggestions = [];
+                              setState(() {});
+                            },
+                          ))
+                      .toList(),
+                ),
+              ],
               if (askindex == 1) ...[
                 const SizedBox(
                   height: 20,
                 ),
                 Container(
-                  height: 350,
+                  height: 430,
                   width: 500,
                   constraints: const BoxConstraints(maxWidth: 800),
                   decoration: BoxDecoration(
-                    border: Border.all(color: Colors.white),
+                    color: const Color.fromARGB(255, 24, 2, 61),
                     borderRadius: BorderRadius.circular(18),
                   ),
                   padding: const EdgeInsets.symmetric(
