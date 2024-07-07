@@ -71,19 +71,17 @@ class _AssessmentOutState extends State<AssessmentOut> {
         comment = decodedResponse['comment'];
 
         _generatedContent.add((image: null, text: text, fromUser: false));
-        if (text == null) {
-          return;
-        } else {
+        if (text != null) {
           setState(() {
-            setState(() {
-              assesindex = 1;
-              _isLoading = false;
-            });
+            assesindex = 1;
+            _isLoading = false;
           });
+        } else {
+          print('error');
         }
       } else {}
     } catch (e) {
-      //do nothing
+      print(e);
     }
   }
 
@@ -105,38 +103,39 @@ class _AssessmentOutState extends State<AssessmentOut> {
                     Center(
                       child: _isLoading
                           ? const CircularProgressIndicator()
-                          : ElevatedButton(
-                              onPressed: () async {
-                                setState(() {
-                                  _isLoading = true;
-                                  sendImagePrompt(widget.prompttext).then((_) {
-                                    setState(() {
-                                      _isLoading = false;
-                                    });
-                                  });
-                                });
-                              },
-                              style: ElevatedButton.styleFrom(
-                                padding: const EdgeInsets.all(8.0),
-                                backgroundColor: Colors.deepPurple,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8.0),
-                                ),
-                              ),
-                              child: _isLoading
-                                  ? const CircularProgressIndicator()
-                                  : const SizedBox(
-                                      width: 150,
-                                      height: 40,
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Icon(Icons.generating_tokens),
-                                          Text('Mark Script'),
-                                        ],
+                          : Column(
+                              children: [
+                                ElevatedButton(
+                                    onPressed: () async {
+                                      setState(() {
+                                        _isLoading = true;
+                                        sendImagePrompt(widget.prompttext);
+                                      });
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      padding: const EdgeInsets.all(8.0),
+                                      backgroundColor: Colors.deepPurple,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(8.0),
                                       ),
-                                    )),
+                                    ),
+                                    child: _isLoading
+                                        ? const CircularProgressIndicator()
+                                        : const SizedBox(
+                                            width: 150,
+                                            height: 40,
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Icon(Icons.generating_tokens),
+                                                Text('Mark Script'),
+                                              ],
+                                            ),
+                                          )),
+                              ],
+                            ),
                     )
                   ],
                   if (assesindex == 1) ...[

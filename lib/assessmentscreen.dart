@@ -202,7 +202,7 @@ class AssessmentScreenState extends State<AssessmentScreen> {
                           child: image == null
                               ? const Center(
                                   child: Text(
-                                  'No Image Script Uploaded',
+                                  'Your Script will appear here',
                                   style: TextStyle(color: Colors.black),
                                 ))
                               : Padding(

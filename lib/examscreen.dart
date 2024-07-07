@@ -202,16 +202,13 @@ class ExamScreenState extends State<ExamScreen> {
                   },
                 ),
                 CustomButton(
-                  icon: Icons.navigate_next,
-                  text: 'Continue',
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
+                    icon: Icons.navigate_next,
+                    text: 'Continue',
+                    onPressed: () {
+                      Navigator.of(context).push(MaterialPageRoute(
                         builder: (context) => Examout(text: _controller.text),
-                      ),
-                    );
-                  },
-                ),
+                      ));
+                    })
               ],
             ),
           ],

@@ -3,13 +3,14 @@ import 'package:eureka/ask.dart';
 import 'package:eureka/assessmentscreen.dart';
 import 'package:eureka/examscreen.dart';
 import 'package:flutter/material.dart';
+import 'package:google_nav_bar/google_nav_bar.dart';
 
 CameraDescription? firstCamera;
 Future<void> main() async {
   runApp(const MyApp());
 }
 
-const String apiKey = "AIzaSyDRiI5PgPjGCoWOjOZxSf0a5P_6lirLPQc";
+const String apiKey = "AIzaSyDsOduZY0h0N2mlPDgjLNzoD2d10TDxaKs";
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
@@ -35,41 +36,70 @@ class MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData.dark(useMaterial3: true).copyWith(
-        scaffoldBackgroundColor: const Color.fromARGB(255, 2, 1, 16),
-        appBarTheme: const AppBarTheme(
-          color: Color.fromARGB(255, 2, 1, 16),
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData.dark(useMaterial3: true).copyWith(
+          scaffoldBackgroundColor: const Color.fromARGB(255, 2, 1, 16),
+          appBarTheme: const AppBarTheme(
+            color: Color.fromARGB(255, 2, 1, 16),
+          ),
+          bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+            backgroundColor: Color.fromARGB(255, 2, 1, 16),
+          ),
         ),
-        bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-          backgroundColor: Color.fromARGB(255, 2, 1, 16),
-        ),
-      ),
-      home: Scaffold(
-        body: IndexedStack(
-          index: _currentIndex,
-          children: _children,
-        ),
-        bottomNavigationBar: BottomNavigationBar(
-          onTap: onTabTapped,
-          selectedItemColor: Colors.deepPurple,
-          currentIndex: _currentIndex,
-          items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.question_answer_outlined),
-              label: 'Ask Ai',
+        home: Scaffold(
+          body: IndexedStack(
+            index: _currentIndex,
+            children: _children,
+          ),
+          bottomNavigationBar: Container(
+            decoration: BoxDecoration(
+              color: const Color.fromARGB(255, 2, 1, 16),
+              boxShadow: [
+                BoxShadow(
+                  blurRadius: 20,
+                  color: Colors.black.withOpacity(.1),
+                ),
+              ],
             ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.book_rounded),
-              label: 'Exams',
+            child: SafeArea(
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 15.0, vertical: 8),
+                child: GNav(
+                  rippleColor: Colors.grey[300]!,
+                  hoverColor: Colors.grey[100]!,
+                  gap: 8,
+                  activeColor: Colors.black,
+                  iconSize: 24,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  duration: const Duration(milliseconds: 400),
+                  tabBackgroundColor: Colors.grey[100]!,
+                  color: Colors.white,
+                  tabs: const [
+                    GButton(
+                      icon: Icons.question_answer,
+                      text: 'Ask AI',
+                    ),
+                    GButton(
+                      icon: Icons.book,
+                      text: 'Exams',
+                    ),
+                    GButton(
+                      icon: Icons.assessment,
+                      text: 'Assessment',
+                    ),
+                  ],
+                  selectedIndex: _currentIndex,
+                  onTabChange: (index) {
+                    setState(() {
+                      _currentIndex = index;
+                    });
+                  },
+                ),
+              ),
             ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.assessment),
-              label: 'Assessment',
-            ),
-          ],
-        ),
-      ),
-    );
+          ),
+        ));
   }
 }
