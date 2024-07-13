@@ -300,7 +300,7 @@ class AssessmentScreenState extends State<AssessmentScreen> {
                 ],
               ),
               SizedBox(
-                width: 100,
+                width: 120,
                 height: 40,
                 child: CustomButton(
                     icon: Icons.navigate_next_rounded,
