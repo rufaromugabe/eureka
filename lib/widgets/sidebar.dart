@@ -1,5 +1,5 @@
-import 'package:eureka/ask.dart';
 import 'package:eureka/assessmentscreen.dart';
+import 'package:eureka/discuss.dart';
 import 'package:eureka/examscreen.dart';
 import 'package:flutter/material.dart';
 
@@ -14,7 +14,7 @@ class _SidebarState extends State<Sidebar> {
   int _currentIndex = 0;
 
   final List<Widget> _children = [
-    const AskAi(),
+    const DiscussAi(),
     const ExamScreen(),
     const AssessmentScreen()
   ];
@@ -65,7 +65,7 @@ class _SidebarState extends State<Sidebar> {
                     leading: const Icon(Icons.question_answer),
                     selectedColor: Colors.black,
                     selected: _currentIndex == 0,
-                    title: const Text('Ask AI'),
+                    title: const Text('Discuss AI'),
                     onTap: () {
                       setState(() {
                         _currentIndex = 0;

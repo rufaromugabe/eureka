@@ -1,7 +1,9 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
+import 'package:audioplayers/audioplayers.dart';
+import 'package:eureka/translateapi.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_tts/flutter_tts.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:lottie/lottie.dart';
 
@@ -17,16 +19,17 @@ class ConversationPiece {
   }
 }
 
-class DialogAi extends StatefulWidget {
-  const DialogAi({super.key});
+class DiscussAi extends StatefulWidget {
+  const DiscussAi({super.key});
 
   @override
-  State<DialogAi> createState() => _DialogAiState();
+  State<DiscussAi> createState() => _DiscussAiState();
 }
 
-class _DialogAiState extends State<DialogAi>
+class _DiscussAiState extends State<DiscussAi>
     with SingleTickerProviderStateMixin {
-  FlutterTts flutterTts = FlutterTts();
+  final TextToSpeechAPI ttsAPI = TextToSpeechAPI();
+  final AudioPlayer audioPlayer = AudioPlayer();
   late final GenerativeModel _model;
   late final GenerationConfig _config;
   AnimationController? _animationController;
@@ -61,7 +64,7 @@ class _DialogAiState extends State<DialogAi>
   void dispose() {
     super.dispose();
     _animationController?.dispose();
-    flutterTts.stop();
+    audioPlayer.dispose();
   }
 
   Future<String> getAnswer(String message) async {
@@ -82,7 +85,7 @@ class _DialogAiState extends State<DialogAi>
           print(conversationJson);
         });
 
-        handleConversation(conversationJson!);
+        _speak(conversationJson!);
         return conversationJson!;
       }
     } catch (e) {
@@ -96,43 +99,71 @@ class _DialogAiState extends State<DialogAi>
     return convJson.map((json) => ConversationPiece.fromJson(json)).toList();
   }
 
-  Future<void> handleConversation(String jsonString) async {
+  void _speak(String jsonString) async {
     List<ConversationPiece> conversationPieces = parseConversation(jsonString);
 
     Future<void> processPiece() async {
-      _talking = true;
-
       if (currentIndex < conversationPieces.length) {
         var piece = conversationPieces[currentIndex];
         if (piece.agent == "John") {
+          const String voiceName = "en-US-Wavenet-D"; // Example voice name
+          const String languageCode = "en-US"; // Example language code
+
           setState(() {
+            _talking = false;
             _isJohn = true;
           });
-          await flutterTts
-              .setVoice({"name": "en-us-x-iol-local", "locale": "en-US"});
-        } else if (piece.agent == "Sheron") {
-          setState(() {
-            _isJohn = false;
-          });
+          final audioContent =
+              await ttsAPI.synthesizeText(piece.text, voiceName, languageCode);
 
-          await flutterTts
-              .setVoice({"name": "en-us-x-tpc-local", "locale": "en-US"});
-        }
-        await flutterTts.speak(piece.text);
-        currentIndex++;
-        flutterTts.setCompletionHandler(() {
-          if (currentIndex < conversationPieces.length) {
-            processPiece();
-          } else {
+          if (audioContent != null) {
             setState(() {
-              _talking = false;
-              _animationController?.stop();
-              currentIndex = 0;
-              conversationPieces.clear();
-              _controller.clear();
+              _talking = true;
+            });
+
+            Uint8List audioBytes = base64Decode(audioContent);
+            // Ensure UI interactions happen on the main thread
+            await Future.microtask(() async {
+              await audioPlayer.setSourceBytes(audioBytes);
+              await audioPlayer.resume();
+              await audioPlayer.onPlayerComplete.first;
             });
           }
-        });
+        } else if (piece.agent == "Sheron") {
+          const String voiceName = "en-US-Wavenet-F"; // Example voice name
+          const String languageCode = "en-US"; // Example language code
+          setState(() {
+            _talking = false;
+            _isJohn = false;
+          });
+          final audioContent =
+              await ttsAPI.synthesizeText(piece.text, voiceName, languageCode);
+          if (audioContent != null) {
+            setState(() {
+              _talking = true;
+            });
+            Uint8List audioBytes = base64Decode(audioContent);
+            // Ensure UI interactions happen on the main thread
+            await Future.microtask(() async {
+              await audioPlayer.setSourceBytes(audioBytes);
+              await audioPlayer.resume();
+              await audioPlayer.onPlayerComplete.first;
+            });
+          }
+        }
+        currentIndex++;
+
+        if (currentIndex < conversationPieces.length) {
+          await processPiece();
+        } else {
+          setState(() {
+            _talking = false;
+            _animationController?.stop();
+            currentIndex = 0;
+            conversationPieces.clear();
+            _controller.clear();
+          });
+        }
       }
     }
 
@@ -170,7 +201,7 @@ class _DialogAiState extends State<DialogAi>
                           ])
                         : Column(children: [
                             const Text(
-                              "Your Turn",
+                              "..........",
                               style: TextStyle(
                                   fontSize: 20, fontWeight: FontWeight.bold),
                             ),

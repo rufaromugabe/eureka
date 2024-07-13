@@ -1,6 +1,6 @@
 import 'package:camera/camera.dart';
 import 'package:eureka/assessmentscreen.dart';
-import 'package:eureka/dialog.dart';
+import 'package:eureka/discuss.dart';
 import 'package:eureka/examscreen.dart';
 import 'package:eureka/widgets/sidebar.dart';
 import 'package:flutter/material.dart';
@@ -23,7 +23,7 @@ class MyApp extends StatefulWidget {
 class MyAppState extends State<MyApp> {
   int _currentIndex = 0;
   final List<Widget> _children = [
-    const DialogAi(),
+    const DiscussAi(),
     const ExamScreen(),
     const AssessmentScreen(),
   ];
