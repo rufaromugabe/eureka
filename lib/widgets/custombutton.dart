@@ -21,15 +21,12 @@ class CustomButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(8.0),
           ),
         ),
-        child: SizedBox(
-          width: 95,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Icon(icon),
-              Text(text),
-            ],
-          ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            Icon(icon),
+            Text(text),
+          ],
         ));
   }
 }

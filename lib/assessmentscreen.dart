@@ -299,17 +299,21 @@ class AssessmentScreenState extends State<AssessmentScreen> {
                   ),
                 ],
               ),
-              CustomButton(
-                  icon: Icons.navigate_next_rounded,
-                  text: 'Continue',
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            AssessmentOut(prompttext: _controller.text),
-                      ),
-                    );
-                  })
+              SizedBox(
+                width: 100,
+                height: 40,
+                child: CustomButton(
+                    icon: Icons.navigate_next_rounded,
+                    text: 'Continue',
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              AssessmentOut(prompttext: _controller.text),
+                        ),
+                      );
+                    }),
+              )
             ],
           ),
         ),

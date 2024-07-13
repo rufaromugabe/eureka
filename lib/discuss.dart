@@ -1,9 +1,11 @@
 import 'dart:convert';
-import 'dart:typed_data';
 
 import 'package:audioplayers/audioplayers.dart';
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:eureka/translateapi.dart';
+import 'package:eureka/widgets/custombutton.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:lottie/lottie.dart';
 
@@ -40,6 +42,7 @@ class _DiscussAiState extends State<DiscussAi>
   bool _isJohn = true;
   bool _ongoing = false;
   String? conversationJson;
+  String conversationHistory = "";
   int currentIndex = 0;
 
   @override
@@ -75,6 +78,8 @@ class _DiscussAiState extends State<DiscussAi>
       setState(() {
         conversationJson = response.text;
         print(conversationJson);
+        // Step 2: Append new message to the chat history
+        conversationHistory += "\nUser: ${_controller.text}\n${response.text!}";
       });
       if (conversationJson == null) {
         return 'Empty response.';
@@ -91,6 +96,19 @@ class _DiscussAiState extends State<DiscussAi>
     } catch (e) {
       return 'Error: ${e.toString()}';
     }
+  }
+
+  void copyChatHistory() {
+    String formatted = conversationHistory
+        .replaceAll('}, ', '\n')
+        .replaceAll(RegExp(r'[\{\}\[\]]'), '')
+        .replaceAll('"agent": ', '')
+        .replaceAll('"conversation": ', '')
+        .replaceAll(', "text"', '')
+        .replaceAll('"', '');
+    Clipboard.setData(ClipboardData(text: formatted)).then((_) {
+      print("Chat history copied to clipboard.");
+    });
   }
 
   List<ConversationPiece> parseConversation(String jsonString) {
@@ -281,6 +299,35 @@ class _DiscussAiState extends State<DiscussAi>
                     ),
                   ),
                 ],
+              ),
+              const SizedBox(height: 30),
+              SizedBox(
+                width: 200,
+                height: 40,
+                child: CustomButton(
+                  text: 'Copy Discussion',
+                  icon: Icons.copy,
+                  onPressed: () {
+                    copyChatHistory();
+                    final snackBar = SnackBar(
+                      /// need to set following properties for best effect of awesome_snackbar_content
+                      elevation: 0,
+                      behavior: SnackBarBehavior.floating,
+                      backgroundColor: Colors.transparent,
+                      content: AwesomeSnackbarContent(
+                        title: 'Success',
+                        message: ' Copied to clipboard',
+
+                        /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
+                        contentType: ContentType.success,
+                      ),
+                    );
+
+                    ScaffoldMessenger.of(context)
+                      ..hideCurrentSnackBar()
+                      ..showSnackBar(snackBar);
+                  },
+                ),
               ),
             ],
           ),
