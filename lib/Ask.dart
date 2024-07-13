@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:docx_to_text/docx_to_text.dart';
 import 'package:eureka/main.dart';
 import 'package:file_picker/file_picker.dart';
@@ -54,7 +53,7 @@ class AskAiState extends State<AskAi> {
       model: 'gemini-1.5-pro-latest',
       apiKey: apiKey,
       systemInstruction: Content.text(
-          "Use this data provided as your knowledge to respond to all questions strictly "),
+          "Use this data provided as your context  but not limited to it. "),
     );
   }
 
@@ -332,8 +331,7 @@ class AskAiState extends State<AskAi> {
                 ),
                 Container(
                   height: 430,
-                  width: 500,
-                  constraints: const BoxConstraints(maxWidth: 800),
+                  width: double.maxFinite,
                   decoration: BoxDecoration(
                     color: const Color.fromARGB(255, 24, 2, 61),
                     borderRadius: BorderRadius.circular(8.0),

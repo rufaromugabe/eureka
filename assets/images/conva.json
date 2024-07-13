@@ -1,0 +1,21 @@
+ {
+    "conversation": [
+      {
+        "agent": "John",
+        "text": "Hey, did you hear about the old house on the hill?"
+      },
+      {
+        "agent": "Sheron",
+        "text": "Yes, they say it's haunted. Want to check it out tonight?"
+      },
+      {
+        "agent": "John",
+        "text": "Sure, but let's bring a flashlight. It gets really dark there."
+      },
+      {
+        "agent": "Sheron",
+        "text": "Good idea. We might find something interesting."
+      }
+    ]
+  }
+

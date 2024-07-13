@@ -91,19 +91,22 @@ class ExamScreenState extends State<ExamScreen> {
             ),
             SizedBox(
               height: 300,
-              width: MediaQuery.of(context).size.width / 1.1,
-              child: TextField(
-                maxLines: 8,
-                controller: _controller,
-                decoration: const InputDecoration(
-                  filled: true,
-                  fillColor: Color.fromARGB(148, 255, 255, 255),
-                  hintText:
-                      'Enter Exam Content i.e Course content or Outlines ',
-                  border: OutlineInputBorder(),
-                  hintStyle: TextStyle(color: Colors.black),
+              width: MediaQuery.of(context).size.width / 1.2,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextField(
+                  maxLines: 8,
+                  controller: _controller,
+                  decoration: const InputDecoration(
+                    filled: true,
+                    fillColor: Color.fromARGB(148, 255, 255, 255),
+                    hintText:
+                        'Enter Exam Content i.e Course content or Outlines ',
+                    border: OutlineInputBorder(),
+                    hintStyle: TextStyle(color: Colors.black),
+                  ),
+                  style: const TextStyle(color: Colors.black),
                 ),
-                style: const TextStyle(color: Colors.black),
               ),
             ),
             const SizedBox(
@@ -162,10 +165,10 @@ class ExamScreenState extends State<ExamScreen> {
               ],
             ),
             Row(
-              mainAxisAlignment: MainAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.all(2.0),
                   child: SizedBox(
                     height: 40,
                     width: 220,
@@ -186,13 +189,16 @@ class ExamScreenState extends State<ExamScreen> {
                   ' ${markSliderValue.round()} Marks ',
                   style: const TextStyle(fontSize: 15),
                 ),
+                const SizedBox(
+                  width: 15,
+                )
               ],
             ),
             const SizedBox(
               height: 20,
             ),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 CustomButton(
                   icon: Icons.file_upload,
@@ -200,6 +206,9 @@ class ExamScreenState extends State<ExamScreen> {
                   onPressed: () {
                     pickAndReadFile();
                   },
+                ),
+                const SizedBox(
+                  width: 50,
                 ),
                 CustomButton(
                     icon: Icons.navigate_next,
