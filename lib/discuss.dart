@@ -207,12 +207,12 @@ class _DiscussAiState extends State<DiscussAi>
                     child: _talking
                         ? Column(children: [
                             Text(
-                              _isJohn ? "John's Turn" : "Sheron's Turn",
+                              _isJohn ? "John" : "Sheron ",
                               style: const TextStyle(
                                   fontSize: 20, fontWeight: FontWeight.bold),
                             ),
                             Lottie.asset(
-                              'assets/images/talk4.json',
+                              'assets/images/voice.json',
                               repeat: true,
                               height: 200,
                             ),
@@ -224,7 +224,7 @@ class _DiscussAiState extends State<DiscussAi>
                                   fontSize: 20, fontWeight: FontWeight.bold),
                             ),
                             Lottie.asset(
-                              'assets/images/talk4.json',
+                              'assets/images/voice.json',
                               controller: _animationController,
                               repeat: true,
                               height: 200,
