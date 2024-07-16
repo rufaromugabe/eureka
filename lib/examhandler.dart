@@ -1,6 +1,7 @@
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:eureka/examscreen.dart';
 import 'package:eureka/main.dart';
+import 'package:eureka/widgets/customappbar.dart';
 import 'package:eureka/widgets/custombutton.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -88,8 +89,8 @@ class _ExamoutState extends State<Examout> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('My Exam Paper'),
+      appBar: const GradientAppBar(
+        titleText: 'Exam Paper',
       ),
       body: LoaderOverlay(
         overlayColor: Colors.black.withOpacity(0.8),

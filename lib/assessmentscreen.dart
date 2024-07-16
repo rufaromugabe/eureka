@@ -5,7 +5,10 @@ import 'package:camera/camera.dart';
 import 'package:docx_to_text/docx_to_text.dart';
 import 'package:eureka/assessmenthandler.dart';
 import 'package:eureka/takepicture.dart';
+import 'package:eureka/widgets/customappbar.dart';
 import 'package:eureka/widgets/custombutton.dart';
+import 'package:eureka/widgets/gradientbutton.dart';
+import 'package:eureka/widgets/nextbutton.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -16,7 +19,7 @@ import 'package:syncfusion_flutter_pdf/pdf.dart';
 double lenSliderValue = 50;
 final ImagePicker _picker = ImagePicker();
 XFile? image;
-Image? imageFIle = Image.asset('assets/images/placeholder.jpg');
+Image? imageFIle = Image.asset('assets/images/placeholder.png');
 
 class AssessmentScreen extends StatefulWidget {
   const AssessmentScreen({
@@ -115,11 +118,11 @@ class AssessmentScreenState extends State<AssessmentScreen> {
   @override
   build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('AI Assessor'),
+      appBar: const GradientAppBar(
+        titleText: 'AI Assessment',
       ),
       body: Padding(
-        padding: const EdgeInsets.all(20.0),
+        padding: const EdgeInsets.all(10.0),
         child: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
           child: Column(
@@ -128,64 +131,35 @@ class AssessmentScreenState extends State<AssessmentScreen> {
               const SizedBox(
                 height: 5,
               ),
-              Row(
-                children: [
-                  InkWell(
-                    hoverColor: Colors.deepPurple.withOpacity(0.2),
-                    onTap: () {
-                      pickAndReadFile();
-                    },
-                    child: Container(
-                      width: 80,
-                      height: 100,
-                      decoration: BoxDecoration(
-                        color: const Color.fromARGB(178, 76, 79, 175),
-                        borderRadius: BorderRadius.circular(8),
+              Container(
+                alignment: Alignment.center,
+                height: 80,
+                child: TextField(
+                  maxLines: 10,
+                  controller: _controller,
+                  decoration: InputDecoration(
+                      prefixIcon: IconButton(
+                        icon: const Icon(
+                          Icons.attach_file,
+                          color: Colors.black,
+                          size: 40,
+                        ),
+                        onPressed: pickAndReadFile,
                       ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          IconButton(
-                            tooltip: "Add File",
-                            icon: const Icon(Icons.upload_file_rounded),
-                            onPressed: () {
-                              pickAndReadFile();
-                            },
-                          ),
-                          const Text('Add File')
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(
-                    width: 10,
-                  ),
-                  Expanded(
-                    child: Container(
-                      alignment: Alignment.center,
-                      height: 100,
-                      child: TextField(
-                        maxLines: 10,
-                        controller: _controller,
-                        decoration: const InputDecoration(
-                            filled: true,
-                            fillColor: Color.fromARGB(148, 255, 255, 255),
-                            hintText:
-                                'Enter Marking guide or Question content ',
-                            border: OutlineInputBorder(),
-                            hintStyle: TextStyle(color: Colors.black)),
-                        style: const TextStyle(color: Colors.black),
-                      ),
-                    ),
-                  ),
-                ],
+                      filled: true,
+                      fillColor: const Color.fromARGB(148, 255, 255, 255),
+                      hintText: 'Enter Marking guide or Answers ',
+                      border: const OutlineInputBorder(),
+                      hintStyle: const TextStyle(color: Colors.black)),
+                  style: const TextStyle(color: Colors.black),
+                ),
               ),
               const SizedBox(
-                height: 20,
+                height: 10,
               ),
               Container(
                 decoration: BoxDecoration(
-                  color: const Color.fromARGB(255, 12, 6, 26),
+                  border: Border.all(color: Colors.white),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Column(
@@ -194,80 +168,63 @@ class AssessmentScreenState extends State<AssessmentScreen> {
                       padding: const EdgeInsets.all(8.0),
                       child: Container(
                           alignment: Alignment.center,
-                          height: 200,
+                          height: 250,
                           decoration: BoxDecoration(
-                            color: const Color.fromARGB(148, 255, 255, 255),
                             borderRadius: BorderRadius.circular(8),
                           ),
-                          child: image == null
-                              ? const Center(
-                                  child: Text(
-                                  'Your Script will appear here',
-                                  style: TextStyle(color: Colors.black),
-                                ))
-                              : Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: imageFIle,
-                                )),
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: imageFIle,
+                          )),
                     ),
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          InkWell(
-                            onTap: () {
-                              imageGet();
+                          CustomButton(
+                            icon: Icons.upload_file,
+                            text: 'Upload Script',
+                            onPressed: () {
+                              showModalBottomSheet(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return Container(
+                                    height: 200,
+                                    decoration: const BoxDecoration(
+                                      color: Color.fromARGB(116, 13, 6, 85),
+                                      borderRadius: BorderRadius.only(
+                                        topLeft: Radius.circular(20),
+                                        topRight: Radius.circular(20),
+                                      ),
+                                    ),
+                                    child: Center(
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceEvenly,
+                                        children: [
+                                          GradientButton(
+                                              iconData: Icons.image,
+                                              tooltip: "Add Gallery",
+                                              onPressed: () {
+                                                imageGet();
+                                                Navigator.pop(context);
+                                              }),
+                                          GradientButton(
+                                              iconData: Icons.camera_alt,
+                                              tooltip: "Add Camera",
+                                              onPressed: () {
+                                                imageGetCamera(context);
+                                                Navigator.pop(context);
+                                              }),
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                },
+                              );
                             },
-                            child: Container(
-                              height: 80,
-                              width: 100,
-                              decoration: BoxDecoration(
-                                color: const Color.fromARGB(178, 76, 79, 175),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  IconButton(
-                                    tooltip: "Add Script",
-                                    icon: const Icon(Icons
-                                        .image), // replace with your preferred icon
-                                    onPressed: () {
-                                      imageGet();
-                                    },
-                                  ),
-                                  const Text('Add Gallery')
-                                ],
-                              ),
-                            ),
-                          ),
-                          InkWell(
-                            onTap: () {
-                              imageGetCamera(context);
-                            },
-                            child: Container(
-                              height: 80,
-                              width: 100,
-                              decoration: BoxDecoration(
-                                color: const Color.fromARGB(178, 76, 79, 175),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  IconButton(
-                                    tooltip: "Add Script",
-                                    icon: const Icon(Icons.image),
-                                    onPressed: () {
-                                      imageGetCamera(context);
-                                    },
-                                  ),
-                                  const Text('Add Camera')
-                                ],
-                              ),
-                            ),
-                          ),
+                          )
                         ],
                       ),
                     ),
@@ -275,7 +232,7 @@ class AssessmentScreenState extends State<AssessmentScreen> {
                 ),
               ),
               const SizedBox(
-                height: 30,
+                height: 20,
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -299,21 +256,36 @@ class AssessmentScreenState extends State<AssessmentScreen> {
                   ),
                 ],
               ),
-              SizedBox(
-                width: 120,
-                height: 40,
-                child: CustomButton(
-                    icon: Icons.navigate_next_rounded,
-                    text: 'Continue',
-                    onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              AssessmentOut(prompttext: _controller.text),
-                        ),
-                      );
-                    }),
-              )
+              const SizedBox(
+                height: 10,
+              ),
+              Container(
+                width: MediaQuery.of(context).size.width / 1.2,
+                height: 50,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8.0),
+                  gradient: const LinearGradient(
+                    colors: [
+                      Color.fromARGB(255, 12, 6, 47),
+                      Color.fromARGB(
+                          255, 138, 130, 224), // Add your gradient colors here
+                    ],
+                    begin: Alignment.topRight,
+                    end: Alignment.topLeft,
+                  ),
+                ),
+                child: Nextbutton(
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            AssessmentOut(prompttext: _controller.text),
+                      ),
+                    );
+                  },
+                  text: 'Continue',
+                ),
+              ),
             ],
           ),
         ),

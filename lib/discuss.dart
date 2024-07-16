@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:eureka/translateapi.dart';
+import 'package:eureka/widgets/customappbar.dart';
 import 'package:eureka/widgets/custombutton.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -191,9 +192,7 @@ class _DiscussAiState extends State<DiscussAi>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('AI Dialog'),
-      ),
+      appBar: const GradientAppBar(titleText: 'Discuss AI'),
       body: Padding(
         padding: const EdgeInsets.all(10),
         child: SingleChildScrollView(
@@ -233,17 +232,58 @@ class _DiscussAiState extends State<DiscussAi>
                   )),
               const SizedBox(height: 20),
               TextField(
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
+                  suffixIcon: _loading
+                      ? const Padding(
+                          padding: EdgeInsets.all(10.0),
+                          child: CircularProgressIndicator(),
+                        )
+                      : IconButton(
+                          onPressed: () async {
+                            setState(() {
+                              _loading = true;
+                            });
+                            FocusScope.of(context).unfocus();
+                            await getAnswer(_controller.text);
+                          },
+                          icon: const Icon(Icons.send)),
                   hintText: 'Enter something to discuss',
-                  border: OutlineInputBorder(),
+                  border: const OutlineInputBorder(),
                 ),
                 controller: _controller,
                 readOnly: _loading,
               ),
               const SizedBox(height: 40),
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
+                  SizedBox(
+                    width: 100,
+                    child: CustomButton(
+                      text: 'Copy',
+                      icon: Icons.copy,
+                      onPressed: () {
+                        copyChatHistory();
+                        final snackBar = SnackBar(
+                          /// need to set following properties for best effect of awesome_snackbar_content
+                          elevation: 0,
+                          behavior: SnackBarBehavior.floating,
+                          backgroundColor: Colors.transparent,
+                          content: AwesomeSnackbarContent(
+                            title: 'Success',
+                            message: ' Copied to clipboard',
+
+                            /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
+                            contentType: ContentType.success,
+                          ),
+                        );
+
+                        ScaffoldMessenger.of(context)
+                          ..hideCurrentSnackBar()
+                          ..showSnackBar(snackBar);
+                      },
+                    ),
+                  ),
                   SizedBox(
                     height: 50,
                     child: ElevatedButton(
@@ -255,7 +295,8 @@ class _DiscussAiState extends State<DiscussAi>
                         await getAnswer("keep going");
                       },
                       style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.deepPurple,
+                          backgroundColor:
+                              const Color.fromARGB(255, 49, 9, 118),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
                           )),
@@ -271,64 +312,9 @@ class _DiscussAiState extends State<DiscussAi>
                             ),
                     ),
                   ),
-                  SizedBox(
-                    height: 50,
-                    child: ElevatedButton(
-                      onPressed: () async {
-                        setState(() {
-                          _loading = true;
-                        });
-                        FocusScope.of(context).unfocus();
-                        await getAnswer(_controller.text);
-                      },
-                      style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.deepPurple,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          )),
-                      child: _loading
-                          ? const CircularProgressIndicator()
-                          : const Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                Text('Suggest'),
-                                SizedBox(width: 10),
-                                Icon(Icons.send),
-                              ],
-                            ),
-                    ),
-                  ),
                 ],
               ),
               const SizedBox(height: 30),
-              SizedBox(
-                width: 200,
-                height: 40,
-                child: CustomButton(
-                  text: 'Copy Discussion',
-                  icon: Icons.copy,
-                  onPressed: () {
-                    copyChatHistory();
-                    final snackBar = SnackBar(
-                      /// need to set following properties for best effect of awesome_snackbar_content
-                      elevation: 0,
-                      behavior: SnackBarBehavior.floating,
-                      backgroundColor: Colors.transparent,
-                      content: AwesomeSnackbarContent(
-                        title: 'Success',
-                        message: ' Copied to clipboard',
-
-                        /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
-                        contentType: ContentType.success,
-                      ),
-                    );
-
-                    ScaffoldMessenger.of(context)
-                      ..hideCurrentSnackBar()
-                      ..showSnackBar(snackBar);
-                  },
-                ),
-              ),
             ],
           ),
         ),

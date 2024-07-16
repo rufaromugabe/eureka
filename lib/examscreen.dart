@@ -2,8 +2,9 @@ import 'dart:io';
 
 import 'package:docx_to_text/docx_to_text.dart';
 import 'package:eureka/examhandler.dart';
-import 'package:eureka/widgets/custombutton.dart';
+import 'package:eureka/widgets/customappbar.dart';
 import 'package:eureka/widgets/customdropdown.dart';
+import 'package:eureka/widgets/nextbutton.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart' as path;
@@ -79,9 +80,9 @@ class ExamScreenState extends State<ExamScreen> {
   @override
   build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Exam Generator'),
-      ),
+      appBar: const GradientAppBar(
+        titleText: 'Create Exam',
+      ), //AppBar
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
         child: Column(
@@ -91,19 +92,28 @@ class ExamScreenState extends State<ExamScreen> {
             ),
             SizedBox(
               height: 300,
-              width: MediaQuery.of(context).size.width / 1.2,
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextField(
                   maxLines: 8,
                   controller: _controller,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
+                    prefixIcon: IconButton(
+                      icon: const Icon(
+                        Icons.upload_file,
+                        color: Colors.black,
+                        size: 40,
+                      ),
+                      onPressed: () {
+                        pickAndReadFile();
+                      },
+                    ),
                     filled: true,
-                    fillColor: Color.fromARGB(148, 255, 255, 255),
+                    fillColor: const Color.fromARGB(148, 255, 255, 255),
                     hintText:
-                        'Enter Exam Content i.e Course content or Outlines ',
-                    border: OutlineInputBorder(),
-                    hintStyle: TextStyle(color: Colors.black),
+                        'Upload Exam Content or Type a Topic (PDF, DOCX, TXT)',
+                    border: const OutlineInputBorder(),
+                    hintStyle: const TextStyle(color: Colors.black),
                   ),
                   style: const TextStyle(color: Colors.black),
                 ),
@@ -195,30 +205,20 @@ class ExamScreenState extends State<ExamScreen> {
               ],
             ),
             const SizedBox(
+              width: 50,
+            ),
+            const SizedBox(
               height: 20,
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                CustomButton(
-                  icon: Icons.file_upload,
-                  text: 'Upload',
+            SizedBox(
+              width: MediaQuery.of(context).size.width / 1.2,
+              child: Nextbutton(
+                  text: 'Continue',
                   onPressed: () {
-                    pickAndReadFile();
-                  },
-                ),
-                const SizedBox(
-                  width: 50,
-                ),
-                CustomButton(
-                    icon: Icons.navigate_next,
-                    text: 'Continue',
-                    onPressed: () {
-                      Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => Examout(text: _controller.text),
-                      ));
-                    })
-              ],
+                    Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => Examout(text: _controller.text),
+                    ));
+                  }),
             ),
           ],
         ),
