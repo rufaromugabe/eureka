@@ -6,10 +6,12 @@ class GradientAppBar extends StatelessWidget implements PreferredSizeWidget {
   final List<Color> gradientColors;
   final Alignment beginAlignment;
   final Alignment endAlignment;
+  final List<Widget>? actions;
 
   const GradientAppBar({
     super.key,
     required this.titleText,
+    this.actions,
     this.gradientColors = const [
       Color.fromARGB(255, 49, 49, 77),
       Color.fromARGB(255, 2, 1, 16),
@@ -34,6 +36,7 @@ class GradientAppBar extends StatelessWidget implements PreferredSizeWidget {
           title: Text(titleText),
           backgroundColor: Colors.transparent,
           elevation: 0, //
+          actions: actions,
         ),
       ),
     );

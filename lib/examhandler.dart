@@ -26,7 +26,6 @@ class _ExamoutState extends State<Examout> {
   late final ChatSession _chat;
 
   Future<String>? _chatFuture;
-  bool _loading = false;
 
   @override
   void initState() {
@@ -42,9 +41,7 @@ class _ExamoutState extends State<Examout> {
   }
 
   Future<String> getExam(String message) async {
-    setState(() {
-      _loading = true;
-    });
+    setState(() {});
     try {
       final response = await _chat.sendMessage(
         Content.text(message),

@@ -4,7 +4,6 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:eureka/translateapi.dart';
 import 'package:eureka/widgets/customappbar.dart';
-import 'package:eureka/widgets/custombutton.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
@@ -41,7 +40,8 @@ class _DiscussAiState extends State<DiscussAi>
   bool _loading = false;
   bool _talking = false;
   bool _isJohn = true;
-  bool _ongoing = false;
+  String? chatitem =
+      "Let's discuss something or have a some fun with John and Sheron in the room";
   String? conversationJson;
   String conversationHistory = "";
   int currentIndex = 0;
@@ -59,7 +59,7 @@ class _DiscussAiState extends State<DiscussAi>
       model: 'gemini-1.5-flash-latest',
       apiKey: "AIzaSyDsOduZY0h0N2mlPDgjLNzoD2d10TDxaKs",
       systemInstruction: Content.text(
-          " you are  two  ai agents   that is  john and sheron  you respond with  json of john 's view and sheron's view on the user request do not repeat what you have alread said . you should make it more real as if  there are  3 people chating. the json format is  {\n  \"conversation\": [\n    {\n      \"agent\": \"John\",\n      \"text\": \"response\"\n    },\n    {\n      \"agent\": \"Sheron\",\n      \"text\": \"response\"\n    },\n    {\n      \"agent\": \"John\",\n      \"text\": \"Another responce.\"\n    },\n    {\n      \"agent\": \"Sheron\",\n      \"text\": \"another response.\"\n    }\n  ]\n}\n  you can be story characters if user need a story or anything where 2 people are involved or immitate a real senario where you take turns in a conversation or presentation  . Give the  script of latest  conversation only  when greeted John or Sheron should make introductions only not both"),
+          " you are  two  ai agents   that is  john and sheron  you respond with  json of john 's view and sheron's view on the user request do not repeat what you have alread said . you should make it more real as if  there are  3 people chating. the json format is  {\n  \"conversation\": [\n    {\n      \"agent\": \"John\",\n      \"text\": \"response\"\n    },\n    {\n      \"agent\": \"Sheron\",\n      \"text\": \"response\"\n    },\n    {\n      \"agent\": \"John\",\n      \"text\": \"Another responce.\"\n    },\n    {\n      \"agent\": \"Sheron\",\n      \"text\": \"another response.\"\n    }\n  ]\n}\n  you can be story characters if user need a story or anything where 2 people are involved or immitate a real senario where you take turns in a conversation or presentation  . Give the  script of latest  conversation only  when greeted John or Sheron should make introductions only not both. Have multiple conversation  turns where possible ."),
     );
     _chat = _model.startChat();
   }
@@ -87,7 +87,6 @@ class _DiscussAiState extends State<DiscussAi>
       } else {
         setState(() {
           _loading = false;
-          _ongoing = false;
           print(conversationJson);
         });
 
@@ -138,6 +137,7 @@ class _DiscussAiState extends State<DiscussAi>
           if (audioContent != null) {
             setState(() {
               _talking = true;
+              chatitem = piece.text;
             });
 
             Uint8List audioBytes = base64Decode(audioContent);
@@ -160,6 +160,7 @@ class _DiscussAiState extends State<DiscussAi>
           if (audioContent != null) {
             setState(() {
               _talking = true;
+              chatitem = piece.text;
             });
             Uint8List audioBytes = base64Decode(audioContent);
             // Ensure UI interactions happen on the main thread
@@ -177,6 +178,7 @@ class _DiscussAiState extends State<DiscussAi>
         } else {
           setState(() {
             _talking = false;
+            chatitem = " Its now your turn 😊";
             _animationController?.stop();
             currentIndex = 0;
             conversationPieces.clear();
@@ -192,7 +194,32 @@ class _DiscussAiState extends State<DiscussAi>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const GradientAppBar(titleText: 'Discuss AI'),
+      appBar: GradientAppBar(
+        titleText: 'Discuss AI',
+        actions: <Widget>[
+          IconButton(
+            icon: const Icon(Icons.copy),
+            onPressed: () {
+              copyChatHistory();
+              final snackBar = SnackBar(
+                /// need to set following properties for best effect of awesome_snackbar_content
+                elevation: 0,
+                behavior: SnackBarBehavior.floating,
+                backgroundColor: Colors.transparent,
+                content: AwesomeSnackbarContent(
+                  title: 'Success',
+                  message: ' Copied to clipboard',
+                  contentType: ContentType.success,
+                ),
+              );
+
+              ScaffoldMessenger.of(context)
+                ..hideCurrentSnackBar()
+                ..showSnackBar(snackBar);
+            },
+          ),
+        ],
+      ),
       body: Padding(
         padding: const EdgeInsets.all(10),
         child: SingleChildScrollView(
@@ -206,7 +233,7 @@ class _DiscussAiState extends State<DiscussAi>
                     child: _talking
                         ? Column(children: [
                             Text(
-                              _isJohn ? "John" : "Sheron ",
+                              _isJohn ? "John Speaking" : "Sheron ",
                               style: const TextStyle(
                                   fontSize: 20, fontWeight: FontWeight.bold),
                             ),
@@ -230,7 +257,33 @@ class _DiscussAiState extends State<DiscussAi>
                             ),
                           ]),
                   )),
-              const SizedBox(height: 20),
+              Container(
+                padding: const EdgeInsets.all(10),
+                height: 200,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: const Color.fromARGB(255, 18, 4, 43),
+                  borderRadius: BorderRadius.circular(10), // Round the corners
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.5), // Shadow color
+                      spreadRadius: 5,
+                      blurRadius: 7,
+                      offset: const Offset(0, 3), // changes position of shadow
+                    ),
+                  ],
+                ),
+                child: SingleChildScrollView(
+                  child: Text(
+                    _isJohn ? "$chatitem " : "$chatitem",
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 40),
               TextField(
                 decoration: InputDecoration(
                   suffixIcon: _loading
@@ -253,68 +306,6 @@ class _DiscussAiState extends State<DiscussAi>
                 controller: _controller,
                 readOnly: _loading,
               ),
-              const SizedBox(height: 40),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  SizedBox(
-                    width: 100,
-                    child: CustomButton(
-                      text: 'Copy',
-                      icon: Icons.copy,
-                      onPressed: () {
-                        copyChatHistory();
-                        final snackBar = SnackBar(
-                          /// need to set following properties for best effect of awesome_snackbar_content
-                          elevation: 0,
-                          behavior: SnackBarBehavior.floating,
-                          backgroundColor: Colors.transparent,
-                          content: AwesomeSnackbarContent(
-                            title: 'Success',
-                            message: ' Copied to clipboard',
-
-                            /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
-                            contentType: ContentType.success,
-                          ),
-                        );
-
-                        ScaffoldMessenger.of(context)
-                          ..hideCurrentSnackBar()
-                          ..showSnackBar(snackBar);
-                      },
-                    ),
-                  ),
-                  SizedBox(
-                    height: 50,
-                    child: ElevatedButton(
-                      onPressed: () async {
-                        setState(() {
-                          _ongoing = true;
-                        });
-                        FocusScope.of(context).unfocus();
-                        await getAnswer("keep going");
-                      },
-                      style: ElevatedButton.styleFrom(
-                          backgroundColor:
-                              const Color.fromARGB(255, 49, 9, 118),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          )),
-                      child: _ongoing
-                          ? const CircularProgressIndicator()
-                          : const Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(Icons.chat),
-                                SizedBox(width: 10),
-                                Text('keep going'),
-                              ],
-                            ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 30),
             ],
           ),
         ),

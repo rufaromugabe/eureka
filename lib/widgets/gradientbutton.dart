@@ -4,10 +4,10 @@ class GradientButton extends StatelessWidget {
   final IconData iconData;
   final String tooltip;
   final VoidCallback onPressed;
-  double width;
-  double height;
+  final double width;
+  final double height;
 
-  GradientButton({
+  const GradientButton({
     super.key,
     required this.iconData,
     required this.tooltip,
