@@ -100,7 +100,7 @@ class ExamScreenState extends State<ExamScreen> {
                   decoration: InputDecoration(
                     prefixIcon: IconButton(
                       icon: const Icon(
-                        Icons.upload_file,
+                        Icons.attach_file,
                         color: Colors.black,
                         size: 40,
                       ),
@@ -211,7 +211,9 @@ class ExamScreenState extends State<ExamScreen> {
               height: 20,
             ),
             SizedBox(
-              width: MediaQuery.of(context).size.width / 1.2,
+              width: MediaQuery.of(context).size.width > 800
+                  ? 500
+                  : MediaQuery.of(context).size.width / 1.2,
               child: Nextbutton(
                   text: 'Continue',
                   onPressed: () {

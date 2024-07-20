@@ -121,172 +121,164 @@ class AssessmentScreenState extends State<AssessmentScreen> {
       appBar: const GradientAppBar(
         titleText: 'AI Assessment',
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(10.0),
-        child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const SizedBox(
-                height: 5,
-              ),
-              Container(
-                alignment: Alignment.center,
-                height: 80,
-                child: TextField(
-                  maxLines: 10,
-                  controller: _controller,
-                  decoration: InputDecoration(
-                      prefixIcon: IconButton(
-                        icon: const Icon(
-                          Icons.attach_file,
-                          color: Colors.black,
-                          size: 40,
-                        ),
-                        onPressed: pickAndReadFile,
-                      ),
-                      filled: true,
-                      fillColor: const Color.fromARGB(148, 255, 255, 255),
-                      hintText: 'Enter Marking guide or Answers ',
-                      border: const OutlineInputBorder(),
-                      hintStyle: const TextStyle(color: Colors.black)),
-                  style: const TextStyle(color: Colors.black),
+      body: Container(
+        child: Padding(
+          padding: const EdgeInsets.all(10.0),
+          child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const SizedBox(
+                  height: 5,
                 ),
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              Container(
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.white),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Container(
-                          alignment: Alignment.center,
-                          height: 250,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(8),
+                Container(
+                  alignment: Alignment.center,
+                  height: 80,
+                  child: TextField(
+                    maxLines: 10,
+                    controller: _controller,
+                    decoration: InputDecoration(
+                        prefixIcon: IconButton(
+                          icon: const Icon(
+                            Icons.attach_file,
+                            color: Colors.black,
+                            size: 40,
                           ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: imageFIle,
-                          )),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          CustomButton(
-                            icon: Icons.upload_file,
-                            text: 'Upload Script',
-                            onPressed: () {
-                              showModalBottomSheet(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return Container(
-                                    height: 200,
-                                    decoration: const BoxDecoration(
-                                      color: Color.fromARGB(116, 13, 6, 85),
-                                      borderRadius: BorderRadius.only(
-                                        topLeft: Radius.circular(20),
-                                        topRight: Radius.circular(20),
-                                      ),
-                                    ),
-                                    child: Center(
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceEvenly,
-                                        children: [
-                                          GradientButton(
-                                              iconData: Icons.image,
-                                              tooltip: "Add Gallery",
-                                              onPressed: () {
-                                                imageGet();
-                                                Navigator.pop(context);
-                                              }),
-                                          GradientButton(
-                                              iconData: Icons.camera_alt,
-                                              tooltip: "Add Camera",
-                                              onPressed: () {
-                                                imageGetCamera(context);
-                                                Navigator.pop(context);
-                                              }),
-                                        ],
-                                      ),
-                                    ),
-                                  );
-                                },
-                              );
-                            },
-                          )
-                        ],
+                          onPressed: pickAndReadFile,
+                        ),
+                        filled: true,
+                        fillColor: const Color.fromARGB(148, 255, 255, 255),
+                        hintText: 'Enter Marking guide or Answers ',
+                        border: const OutlineInputBorder(),
+                        hintStyle: const TextStyle(color: Colors.black)),
+                    style: const TextStyle(color: Colors.black),
+                  ),
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                        color: const Color.fromARGB(91, 255, 255, 255)),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Container(
+                            alignment: Alignment.center,
+                            height: 250,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: imageFIle,
+                            )),
                       ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            CustomButton(
+                              icon: Icons.upload_file,
+                              text: 'Upload Script',
+                              onPressed: () {
+                                showModalBottomSheet(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return Container(
+                                      height: 200,
+                                      decoration: const BoxDecoration(
+                                        color: Color.fromARGB(116, 13, 6, 85),
+                                        borderRadius: BorderRadius.only(
+                                          topLeft: Radius.circular(20),
+                                          topRight: Radius.circular(20),
+                                        ),
+                                      ),
+                                      child: Center(
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceEvenly,
+                                          children: [
+                                            GradientButton(
+                                                iconData: Icons.image,
+                                                tooltip: "Add Gallery",
+                                                onPressed: () {
+                                                  imageGet();
+                                                  Navigator.pop(context);
+                                                }),
+                                            GradientButton(
+                                                iconData: Icons.camera_alt,
+                                                tooltip: "Add Camera",
+                                                onPressed: () {
+                                                  imageGetCamera(context);
+                                                  Navigator.pop(context);
+                                                }),
+                                          ],
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                );
+                              },
+                            )
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Expanded(
+                      child: Slider(
+                        value: lenSliderValue,
+                        min: 0,
+                        max: 100,
+                        divisions: 100,
+                        onChanged: (double value) {
+                          setState(() {
+                            lenSliderValue = value;
+                          });
+                        },
+                      ),
+                    ),
+                    Text(
+                      ' ${lenSliderValue.round()} % Leniency',
+                      style: const TextStyle(fontSize: 16),
                     ),
                   ],
                 ),
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  Expanded(
-                    child: Slider(
-                      value: lenSliderValue,
-                      min: 0,
-                      max: 100,
-                      divisions: 100,
-                      onChanged: (double value) {
-                        setState(() {
-                          lenSliderValue = value;
-                        });
-                      },
-                    ),
-                  ),
-                  Text(
-                    ' ${lenSliderValue.round()} % Leniency',
-                    style: const TextStyle(fontSize: 16),
-                  ),
-                ],
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              Container(
-                width: MediaQuery.of(context).size.width / 1.2,
-                height: 50,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8.0),
-                  gradient: const LinearGradient(
-                    colors: [
-                      Color.fromARGB(255, 12, 6, 47),
-                      Color.fromARGB(
-                          255, 138, 130, 224), // Add your gradient colors here
-                    ],
-                    begin: Alignment.topRight,
-                    end: Alignment.topLeft,
+                const SizedBox(
+                  height: 10,
+                ),
+                SizedBox(
+                  width: MediaQuery.of(context).size.width > 800
+                      ? 500
+                      : MediaQuery.of(context).size.width / 1.2,
+                  child: Nextbutton(
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              AssessmentOut(prompttext: _controller.text),
+                        ),
+                      );
+                    },
+                    text: 'Continue',
                   ),
                 ),
-                child: Nextbutton(
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            AssessmentOut(prompttext: _controller.text),
-                      ),
-                    );
-                  },
-                  text: 'Continue',
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

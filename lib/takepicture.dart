@@ -46,7 +46,7 @@ class TakePictureScreenState extends State<TakePictureScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 CameraPreview(_controller),
-                ElevatedButton(
+                IconButton(
                     onPressed: () async {
                       try {
                         await _initializeControllerFuture;
@@ -59,22 +59,11 @@ class TakePictureScreenState extends State<TakePictureScreen> {
                             imageFIle = Image.memory(bytes);
                           });
 
-                          // ignore: use_build_context_synchronously
                           Navigator.pop(context, imageFIle);
                         }
-                      } catch (e) {
-                        //to be done
-                      }
+                      } catch (e) {}
                     },
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.lightBlue,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8.0),
-                        )),
-                    child: const Icon(
-                      Icons.camera_alt,
-                      size: 40,
-                    ))
+                    icon: const Icon(Icons.camera_alt, size: 50)),
               ],
             );
           } else {

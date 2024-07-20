@@ -124,8 +124,8 @@ class _DiscussAiState extends State<DiscussAi>
       if (currentIndex < conversationPieces.length) {
         var piece = conversationPieces[currentIndex];
         if (piece.agent == "John") {
-          const String voiceName = "en-US-Wavenet-D"; // Example voice name
-          const String languageCode = "en-US"; // Example language code
+          const String voiceName = "en-US-Wavenet-D";
+          const String languageCode = "en-US";
 
           setState(() {
             _talking = false;
@@ -149,8 +149,8 @@ class _DiscussAiState extends State<DiscussAi>
             });
           }
         } else if (piece.agent == "Sheron") {
-          const String voiceName = "en-US-Wavenet-F"; // Example voice name
-          const String languageCode = "en-US"; // Example language code
+          const String voiceName = "en-US-Wavenet-F";
+          const String languageCode = "en-US";
           setState(() {
             _talking = false;
             _isJohn = false;
@@ -163,7 +163,7 @@ class _DiscussAiState extends State<DiscussAi>
               chatitem = piece.text;
             });
             Uint8List audioBytes = base64Decode(audioContent);
-            // Ensure UI interactions happen on the main thread
+
             await Future.microtask(() async {
               await audioPlayer.setSourceBytes(audioBytes);
               await audioPlayer.resume();
@@ -202,7 +202,6 @@ class _DiscussAiState extends State<DiscussAi>
             onPressed: () {
               copyChatHistory();
               final snackBar = SnackBar(
-                /// need to set following properties for best effect of awesome_snackbar_content
                 elevation: 0,
                 behavior: SnackBarBehavior.floating,
                 backgroundColor: Colors.transparent,
@@ -225,7 +224,7 @@ class _DiscussAiState extends State<DiscussAi>
         child: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.end,
             children: [
               SizedBox(
                   height: 250,
@@ -258,21 +257,13 @@ class _DiscussAiState extends State<DiscussAi>
                           ]),
                   )),
               Container(
+                alignment: Alignment.topCenter,
                 padding: const EdgeInsets.all(10),
-                height: 200,
+                height: 250,
                 width: double.infinity,
                 decoration: BoxDecoration(
-                  color: const Color.fromARGB(255, 18, 4, 43),
-                  borderRadius: BorderRadius.circular(10), // Round the corners
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.5), // Shadow color
-                      spreadRadius: 5,
-                      blurRadius: 7,
-                      offset: const Offset(0, 3), // changes position of shadow
-                    ),
-                  ],
-                ),
+                    border: Border.all(
+                        color: const Color.fromARGB(60, 255, 255, 255))),
                 child: SingleChildScrollView(
                   child: Text(
                     _isJohn ? "$chatitem " : "$chatitem",
@@ -300,8 +291,13 @@ class _DiscussAiState extends State<DiscussAi>
                             await getAnswer(_controller.text);
                           },
                           icon: const Icon(Icons.send)),
+                  filled: true,
+                  fillColor: const Color.fromARGB(33, 221, 227, 234),
                   hintText: 'Enter something to discuss',
-                  border: const OutlineInputBorder(),
+                  border: const OutlineInputBorder().copyWith(
+                      borderSide: BorderSide.none,
+                      borderRadius:
+                          const BorderRadius.all(Radius.circular(20))),
                 ),
                 controller: _controller,
                 readOnly: _loading,

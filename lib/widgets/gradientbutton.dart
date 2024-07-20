@@ -28,7 +28,7 @@ class GradientButton extends StatelessWidget {
           borderRadius: BorderRadius.all(Radius.circular(8)),
           gradient: LinearGradient(
             colors: [
-              Color.fromARGB(255, 105, 55, 140), // Start color
+              Color.fromARGB(255, 55, 109, 140), // Start color
               Color.fromARGB(255, 10, 5, 72), // End color
             ],
             begin: Alignment.topLeft,

@@ -3,8 +3,11 @@ import 'dart:convert';
 import 'package:eureka/assessmentscreen.dart';
 import 'package:eureka/main.dart';
 import 'package:eureka/widgets/customappbar.dart';
+import 'package:eureka/widgets/gradientbutton.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
+import 'package:loader_overlay/loader_overlay.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 
 class AssessmentOut extends StatefulWidget {
@@ -21,7 +24,7 @@ class AssessmentOut extends StatefulWidget {
 
 class _AssessmentOutState extends State<AssessmentOut> {
   String? _response = "";
-  bool _isLoading = false;
+
   Image? imageFIle = Image.asset('assets/images/placeholder.jpg');
   late final GenerationConfig _config;
   int assesindex = 0;
@@ -75,9 +78,11 @@ class _AssessmentOutState extends State<AssessmentOut> {
         if (text != null) {
           setState(() {
             assesindex = 1;
-            _isLoading = false;
+
+            context.loaderOverlay.hide();
           });
         } else {
+          context.loaderOverlay.hide();
           print('error');
         }
       } else {}
@@ -92,127 +97,116 @@ class _AssessmentOutState extends State<AssessmentOut> {
       appBar: const GradientAppBar(
         titleText: 'Assessment',
       ),
-      body: Center(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Flexible(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  if (assesindex == 0) ...[
-                    Center(
-                      child: _isLoading
-                          ? const CircularProgressIndicator()
-                          : Column(
-                              children: [
-                                ElevatedButton(
-                                    onPressed: () async {
-                                      setState(() {
-                                        _isLoading = true;
-                                        sendImagePrompt(widget.prompttext);
-                                      });
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                      padding: const EdgeInsets.all(8.0),
-                                      backgroundColor: Colors.deepPurple,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(8.0),
-                                      ),
-                                    ),
-                                    child: _isLoading
-                                        ? const CircularProgressIndicator()
-                                        : const SizedBox(
-                                            width: 150,
-                                            height: 40,
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                Icon(Icons.generating_tokens),
-                                                Text('Mark Script'),
-                                              ],
-                                            ),
-                                          )),
-                              ],
-                            ),
-                    )
-                  ],
-                  if (assesindex == 1) ...[
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    Flexible(
-                      child: Padding(
-                        padding: const EdgeInsets.all(5.0),
-                        child: Container(
-                          constraints: const BoxConstraints(maxWidth: 800),
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.white),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          padding: const EdgeInsets.symmetric(
-                            vertical: 15,
-                            horizontal: 20,
-                          ),
-                          margin: const EdgeInsets.only(bottom: 8),
-                          child: SingleChildScrollView(
-                              child: Column(children: [
-                            Container(
-                              height: 360,
-                              decoration: BoxDecoration(
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.white.withOpacity(0.1),
-                                    spreadRadius: 5,
-                                    blurRadius: 7,
-                                    offset: const Offset(0, 3),
-                                  ),
-                                ],
-                              ),
-                              child: imageFIle!,
-                            ),
-                            const SizedBox(
-                              height: 2,
-                            ),
-                            if (mark != null && comment != null) ...[
-                              Padding(
-                                padding: const EdgeInsets.all(30.0),
-                                child: CircularPercentIndicator(
-                                  radius: 50.0,
-                                  lineWidth: 13.0,
-                                  animation: true,
-                                  percent: double.parse(mark!) / 100,
-                                  center: Text(
-                                    "$mark%",
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 20.0),
-                                  ),
-                                  circularStrokeCap: CircularStrokeCap.round,
-                                  progressColor: Colors.green,
-                                ),
-                              ),
-                              Container(
-                                  decoration: BoxDecoration(
-                                    color: const Color.fromARGB(255, 24, 2, 61),
-                                    borderRadius: BorderRadius.circular(8.0),
-                                  ),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Text(comment!),
-                                  )),
-                            ]
-                          ])),
+      body: LoaderOverlay(
+        overlayColor: Colors.black.withOpacity(0.8),
+        child: Center(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Flexible(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    if (assesindex == 0) ...[
+                      Center(
+                        child: GradientButton(
+                          onPressed: () async {
+                            context.loaderOverlay.show(
+                              widgetBuilder: (progress) {
+                                return const Center(
+                                    child: SpinKitCubeGrid(
+                                  color: Color.fromARGB(255, 90, 95, 228),
+                                  size: 100.0,
+                                ));
+                              },
+                            );
+                            setState(() {
+                              sendImagePrompt(widget.prompttext);
+                            });
+                          },
+                          iconData: Icons.generating_tokens,
+                          tooltip: 'Mark Script',
                         ),
+                      )
+                    ],
+                    if (assesindex == 1) ...[
+                      const SizedBox(
+                        height: 20,
                       ),
-                    )
-                  ]
-                ],
+                      Flexible(
+                        child: Padding(
+                          padding: const EdgeInsets.all(5.0),
+                          child: Container(
+                            constraints: const BoxConstraints(maxWidth: 800),
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                  color:
+                                      const Color.fromARGB(75, 255, 255, 255)),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 15,
+                              horizontal: 20,
+                            ),
+                            margin: const EdgeInsets.only(bottom: 8),
+                            child: SingleChildScrollView(
+                                child: Column(children: [
+                              Container(
+                                height: 200,
+                                decoration: BoxDecoration(
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.white.withOpacity(0.1),
+                                      spreadRadius: 5,
+                                      blurRadius: 7,
+                                      offset: const Offset(0, 3),
+                                    ),
+                                  ],
+                                ),
+                                child: imageFIle!,
+                              ),
+                              const SizedBox(
+                                height: 2,
+                              ),
+                              if (mark != null && comment != null) ...[
+                                Padding(
+                                  padding: const EdgeInsets.all(30.0),
+                                  child: CircularPercentIndicator(
+                                    radius: 50.0,
+                                    lineWidth: 13.0,
+                                    animation: true,
+                                    percent: double.parse(mark!) / 100,
+                                    center: Text(
+                                      "$mark%",
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 20.0),
+                                    ),
+                                    circularStrokeCap: CircularStrokeCap.round,
+                                    progressColor: Colors.green,
+                                  ),
+                                ),
+                                Container(
+                                    decoration: BoxDecoration(
+                                      color:
+                                          const Color.fromARGB(255, 24, 2, 61),
+                                      borderRadius: BorderRadius.circular(8.0),
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Text(comment!),
+                                    )),
+                              ]
+                            ])),
+                          ),
+                        ),
+                      )
+                    ]
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

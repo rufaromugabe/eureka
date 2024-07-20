@@ -3,6 +3,7 @@ import 'package:eureka/examscreen.dart';
 import 'package:eureka/main.dart';
 import 'package:eureka/widgets/customappbar.dart';
 import 'package:eureka/widgets/custombutton.dart';
+import 'package:eureka/widgets/gradientbutton.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
@@ -24,8 +25,6 @@ class _ExamoutState extends State<Examout> {
   int guidindex = 0;
   late final GenerativeModel _model;
   late final ChatSession _chat;
-
-  Future<String>? _chatFuture;
 
   @override
   void initState() {
@@ -104,16 +103,8 @@ class _ExamoutState extends State<Examout> {
                         child: Container(
                           padding: const EdgeInsets.all(20),
                           decoration: BoxDecoration(
-                            color: Colors.white,
                             borderRadius: BorderRadius.circular(10),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.5),
-                                spreadRadius: 5,
-                                blurRadius: 7,
-                                offset: const Offset(0, 3),
-                              ),
-                            ],
+                            border: Border.all(color: Colors.white),
                           ),
                           margin: const EdgeInsets.only(bottom: 8),
                           child: Column(
@@ -123,7 +114,6 @@ class _ExamoutState extends State<Examout> {
                                 style: TextStyle(
                                   fontSize: 30,
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.blue,
                                 ),
                               ),
                               const SizedBox(height: 10),
@@ -132,7 +122,6 @@ class _ExamoutState extends State<Examout> {
                                 style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 18,
-                                  color: Colors.black,
                                 ),
                               ),
                               Text(
@@ -140,7 +129,6 @@ class _ExamoutState extends State<Examout> {
                                 style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 18,
-                                  color: Colors.black,
                                 ),
                               ),
                               Text(
@@ -148,7 +136,6 @@ class _ExamoutState extends State<Examout> {
                                 style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 18, // Adjusted font size
-                                  color: Colors.black, // Adjusted font color
                                 ),
                               ),
                             ],
@@ -158,13 +145,14 @@ class _ExamoutState extends State<Examout> {
                       const SizedBox(
                         height: 50,
                       ),
-                      ElevatedButton(
+                      GradientButton(
+                          iconData: Icons.download,
                           onPressed: () {
                             context.loaderOverlay.show(
                               widgetBuilder: (progress) {
                                 return const Center(
                                     child: SpinKitCubeGrid(
-                                  color: Colors.deepPurple,
+                                  color: Color.fromARGB(255, 90, 95, 228),
                                   size: 100.0,
                                 ));
                               },
@@ -173,30 +161,7 @@ class _ExamoutState extends State<Examout> {
                               getExam(widget.text);
                             });
                           },
-                          style: ElevatedButton.styleFrom(
-                            padding: const EdgeInsets.all(8.0),
-                            backgroundColor: Colors.deepPurple,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8.0),
-                            ),
-                          ),
-                          child: const SizedBox(
-                            width: 150,
-                            height: 60,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(Icons.get_app_sharp),
-                                Text(
-                                  'Get Exam',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                )
-                              ],
-                            ),
-                          )),
+                          tooltip: 'Get Paper'),
                     ],
                   ),
                 )
@@ -259,41 +224,31 @@ class _ExamoutState extends State<Examout> {
                                             ..showSnackBar(snackBar);
                                         },
                                       ),
-                                      ElevatedButton(
-                                        onPressed: () {
-                                          setState(() {
-                                            guidindex = 1;
-                                            _chatFuture = getExam(
-                                                'Give the Marking guide for the Exam above');
-                                          });
-                                          Clipboard.setData(
-                                              ClipboardData(text: _response!));
-                                        },
-                                        style: ElevatedButton.styleFrom(
-                                          padding: const EdgeInsets.all(8.0),
-                                          backgroundColor: Colors.deepPurple,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(8.0),
-                                          ),
-                                        ),
-                                        child: FutureBuilder<String>(
-                                          future: _chatFuture,
-                                          builder: (BuildContext context,
-                                              AsyncSnapshot<String> snapshot) {
-                                            if (snapshot.connectionState ==
-                                                ConnectionState.waiting) {
-                                              return const CircularProgressIndicator();
-                                            } else {
-                                              return const Row(
-                                                children: [
-                                                  Icon(Icons
-                                                      .question_answer_outlined),
-                                                  Text('Marking guide'),
-                                                ],
-                                              );
-                                            }
+                                      SizedBox(
+                                        height: 50,
+                                        child: CustomButton(
+                                          onPressed: () {
+                                            context.loaderOverlay.show(
+                                              widgetBuilder: (progress) {
+                                                return const Center(
+                                                    child: SpinKitCubeGrid(
+                                                  color: Color.fromARGB(
+                                                      255, 90, 95, 228),
+                                                  size: 100.0,
+                                                ));
+                                              },
+                                            );
+                                            setState(() {
+                                              guidindex = 1;
+                                              getExam(
+                                                  'Give the Marking guide for the Exam above');
+                                            });
+
+                                            Clipboard.setData(ClipboardData(
+                                                text: _response!));
                                           },
+                                          text: 'Marking Guide',
+                                          icon: Icons.assignment,
                                         ),
                                       ),
                                     ],
