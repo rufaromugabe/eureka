@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:eureka/assessmentscreen.dart';
-import 'package:eureka/main.dart';
+import 'package:eureka/splashscreen.dart';
 import 'package:eureka/widgets/customappbar.dart';
 import 'package:eureka/widgets/gradientbutton.dart';
 import 'package:flutter/material.dart';

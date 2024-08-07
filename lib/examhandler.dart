@@ -1,6 +1,6 @@
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:eureka/examscreen.dart';
-import 'package:eureka/main.dart';
+import 'package:eureka/splashscreen.dart';
 import 'package:eureka/widgets/customappbar.dart';
 import 'package:eureka/widgets/custombutton.dart';
 import 'package:eureka/widgets/gradientbutton.dart';

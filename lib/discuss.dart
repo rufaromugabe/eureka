@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:audioplayers/audioplayers.dart';
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
+import 'package:eureka/splashscreen.dart';
 import 'package:eureka/translateapi.dart';
 import 'package:eureka/widgets/customappbar.dart';
 import 'package:flutter/material.dart';
@@ -57,7 +58,7 @@ class _DiscussAiState extends State<DiscussAi>
     _model = GenerativeModel(
       generationConfig: _config,
       model: 'gemini-1.5-flash-latest',
-      apiKey: "AIzaSyDsOduZY0h0N2mlPDgjLNzoD2d10TDxaKs",
+      apiKey: apiKey,
       systemInstruction: Content.text(
           " you are  two  ai agents   that is  john and sheron  you respond with  json of john 's view and sheron's view on the user request do not repeat what you have alread said . you should make it more real as if  there are  3 people chating. the json format is  {\n  \"conversation\": [\n    {\n      \"agent\": \"John\",\n      \"text\": \"response\"\n    },\n    {\n      \"agent\": \"Sheron\",\n      \"text\": \"response\"\n    },\n    {\n      \"agent\": \"John\",\n      \"text\": \"Another responce.\"\n    },\n    {\n      \"agent\": \"Sheron\",\n      \"text\": \"another response.\"\n    }\n  ]\n}\n  you can be story characters if user need a story or anything where 2 people are involved or immitate a real senario where you take turns in a conversation or presentation  . Give the  script of latest  conversation only  when greeted John or Sheron should make introductions only not both. Have multiple conversation  turns where possible ."),
     );
@@ -94,6 +95,7 @@ class _DiscussAiState extends State<DiscussAi>
         return conversationJson!;
       }
     } catch (e) {
+      _loading = false;
       return 'Error: ${e.toString()}';
     }
   }

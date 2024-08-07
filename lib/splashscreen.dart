@@ -1,6 +1,8 @@
 import 'package:eureka/main.dart';
 import 'package:flutter/material.dart';
 
+String apiKey = "";
+
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
@@ -9,14 +11,40 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  TextEditingController textFieldController = TextEditingController();
+  bool loading = false;
   @override
   void initState() {
     super.initState();
-    _navigateToHome();
+  }
+
+  void _showInputDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text(
+              'Go to https://aistudio.google.com/app/apikey and get you API to continue'),
+          content: TextField(
+            controller: textFieldController,
+            decoration: const InputDecoration(hintText: "Gemini Key"),
+          ),
+          actions: <Widget>[
+            ElevatedButton(
+              child: const Text('Submit'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                _navigateToHome();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   _navigateToHome() async {
-    await Future.delayed(const Duration(seconds: 3), () {});
+    await Future.delayed(const Duration(seconds: 1), () {});
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Navigator.pushReplacement(
         context,
@@ -47,6 +75,18 @@ class _SplashScreenState extends State<SplashScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              ElevatedButton(
+                onPressed: () {
+                  _showInputDialog(context);
+                  setState(() {
+                    apiKey = textFieldController.text;
+                    loading = true;
+                  });
+                },
+                child: loading
+                    ? const CircularProgressIndicator()
+                    : const Text('Add Gemini Key'),
+              ),
               Image.asset(
                 'assets/images/logo.png',
                 width: 100,

@@ -14,8 +14,6 @@ Future<void> main() async {
 
 bool splash = true;
 
-const String apiKey = "AIzaSyDsOduZY0h0N2mlPDgjLNzoD2d10TDxaKs";
-
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
