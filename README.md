@@ -78,7 +78,7 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 Rufaro Mugabe - [rufaromugabe@gmail.com](mailto:rufarorevmugabe@gmail.com)
 
-Project Link: [https://github.com/rufaromugabe/eureka](https://github.com/rufarorev/eureka)
+Project Link: [https://github.com/rufaromugabe/eureka](https://github.com/rufaromugabe/eureka)
 
 ```
 
