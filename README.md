@@ -75,7 +75,3 @@ Contributions are what make the open-source community such an amazing place to l
 Rufaro Mugabe - [Email](mailto:rufarorevmugabe@gmail.com)
 
 Project Link: [https://github.com/rufaromugabe/eureka](https://github.com/rufaromugabe/eureka)
-
-```
-
-Feel free to customize the contact details and project link as needed.
