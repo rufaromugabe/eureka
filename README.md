@@ -1,6 +1,5 @@
 
 
-```markdown
 # Eureka
 
 Eureka is a Flutter-based AI study app designed to help students track their study time and receive helpful notices. Leveraging the power of AI, Eureka provides personalized study recommendations and assistance.
@@ -70,13 +69,10 @@ Contributions are what make the open-source community such an amazing place to l
 4. Push to the Branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-### License
-
-Distributed under the MIT License. See `LICENSE` for more information.
 
 ### Contact
 
-Rufaro Mugabe - [rufaromugabe@gmail.com](mailto:rufarorevmugabe@gmail.com)
+Rufaro Mugabe - [Email](mailto:rufarorevmugabe@gmail.com)
 
 Project Link: [https://github.com/rufaromugabe/eureka](https://github.com/rufaromugabe/eureka)
 
