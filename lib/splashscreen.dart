@@ -33,8 +33,20 @@ class _SplashScreenState extends State<SplashScreen> {
             ElevatedButton(
               child: const Text('Submit'),
               onPressed: () {
-                Navigator.of(context).pop();
-                _navigateToHome();
+                if (textFieldController.text.isEmpty) {
+                  // Show an error message if the input is invalid
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                        content: Text('Please enter a valid Gemini Key')),
+                  );
+                } else {
+                  Navigator.of(context).pop();
+                  setState(() {
+                    apiKey = textFieldController.text;
+                    loading = true;
+                  });
+                  _navigateToHome();
+                }
               },
             ),
           ],
@@ -78,10 +90,6 @@ class _SplashScreenState extends State<SplashScreen> {
               ElevatedButton(
                 onPressed: () {
                   _showInputDialog(context);
-                  setState(() {
-                    apiKey = textFieldController.text;
-                    loading = true;
-                  });
                 },
                 child: loading
                     ? const CircularProgressIndicator()

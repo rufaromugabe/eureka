@@ -95,7 +95,30 @@ class _DiscussAiState extends State<DiscussAi>
         return conversationJson!;
       }
     } catch (e) {
-      _loading = false;
+      if (mounted) {
+        setState(() {
+          _loading = false;
+        });
+
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('Connection Error'),
+              content: Text(e.toString()),
+              actions: <Widget>[
+                TextButton(
+                  child: const Text('Close'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      }
+
       return 'Error: ${e.toString()}';
     }
   }

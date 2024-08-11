@@ -82,12 +82,49 @@ class _AssessmentOutState extends State<AssessmentOut> {
             context.loaderOverlay.hide();
           });
         } else {
-          context.loaderOverlay.hide();
-          print('error');
+          if (mounted) {
+            context.loaderOverlay.hide();
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: const Text('Error'),
+                  content: const Text('No response from server'),
+                  actions: <Widget>[
+                    TextButton(
+                      child: const Text('Close'),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                  ],
+                );
+              },
+            );
+          }
         }
       } else {}
     } catch (e) {
-      print(e);
+      if (mounted) {
+        context.loaderOverlay.hide();
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('Connection Error'),
+              content: Text(e.toString()),
+              actions: <Widget>[
+                TextButton(
+                  child: const Text('Close'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      }
     }
   }
 
